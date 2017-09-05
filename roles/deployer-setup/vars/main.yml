@@ -23,7 +23,7 @@ hlinux_apt_repo_loc: /media/cdrom
 hlinux_apt_backup_loc: /tmp/backup.tar
 foreign_apt_tarball_loc: "{{ ardanauser_home }}/foreign_apt_repo.tgz"
 # The actual names of these tarballs contain an embedded timestamp so we have to search for them.
-netboot_tarball_glob: "{{ hlinux_apt_repo_loc }}/extras/hLinux-{{ hlinux_distro }}-amd64-netboot-*-hlm*.tar.gz"
+netboot_tarball_glob: "{{ hlinux_apt_repo_loc }}/extras/hLinux-{{ hlinux_distro }}-amd64-netboot-*.tar.gz"
 cmc32_apt_tarball_glob: "{{ hlinux_apt_repo_loc }}/extras/hLinux-cmc-i386*.tar.gz"
 grub_net_glob: "{{ hlinux_apt_repo_loc }}/extras/grub*efi"
 deployer_setup_hlinux_qcow2: "{{ hlinux_apt_repo_loc }}/hos/hlinux.qcow2"
