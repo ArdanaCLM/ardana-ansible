@@ -1,0 +1,51 @@
+#
+# (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+hlinux_repo_dir: hlinux
+foreign_repo_dir: foreign
+hlinux_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ hlinux_repo_dir }}"
+foreign_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ hlinux_repo_dir }}"
+deployer_prerequisites:
+    - python-yaml
+    - ipmitool
+    - openssl
+
+deployer_packages:
+    - screen
+
+deployer_setup_hook_plays:
+    - cloud-configure
+    - cluster-credentials-change
+    - deploy
+    - keystone-credentials-change
+    - other-credentials-change
+    - rabbitmq-credentials-change
+    - reconfigure
+    - start
+    - status
+    - stop
+    - upgrade
+deployer_setup_deploy_dir: "{{ playbook_dir }}"
+deployer_setup_play_templates:
+  - ardana-{{ item }}.yml.j2
+  - _ardana-default.yml.j2
+deployer_setup_pre_hook: "hooks.d/%(name)s/pre-%(play)s.yml"
+deployer_setup_post_hook: "hooks.d/%(name)s/post-%(play)s.yml"
+
+dupe_files_loc: "/media/cdrom/pool_duplicate_files.list"
+delta_target_version_file: "/media/cdrom/delta_target_version"
+ardana_version_file: "/etc/Ardana_version"

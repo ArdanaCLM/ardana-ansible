@@ -1,0 +1,51 @@
+#
+# (c) Copyright 2015,2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+- name: sosreport | install | Update venv cache
+  become: yes
+  install_package:
+    cache: update
+
+- name: sosreport | install | Install sosreport
+  become: yes
+  install_package:
+    name: sos
+    service: sos
+    state: present
+
+- name: sosreport | install | add symlink
+  become: yes
+  file:
+    src: "{{ 'sos' | bin_dir }}/sosreport"
+    dest: /usr/local/bin/sosreport
+    owner: root
+    group: root
+    state: link
+
+- name: sosreport | install | add conf file
+  become: yes
+  synchronize:
+    src: "sos.conf"
+    dest: "/etc/"
+  when: inventory_hostname != "localhost"
+
+- name: sosreport | install | add conf file
+  become: yes
+  synchronize:
+    src: "sos.conf"
+    dest: "/etc/"
+  when: inventory_hostname == "localhost"

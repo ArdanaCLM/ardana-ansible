@@ -1,0 +1,88 @@
+#
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Fail if parent is not an existing service
+  fail:
+    msg: "Error: Service '{{ parent }}' does not exist!"
+  when: >
+    parent_explicit | bool and
+    (item != 'redhat' or (third_party_rhel_enabled | default(false) | bool))
+    and
+    (item != 'suse' or (third_party_sles_enabled | default(false) | bool))
+    and
+    pkg_manifests[item] != "" and
+    "{{ pkg_manifests[item] | package_max_unpatched_version(parent) }}" == ""
+  with_items: "{{ distro_list }}"
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Make temp wheelhouse for content to install
+  set_fact:
+    wheelhouse: "{{ lookup('pipe', 'mktemp -d') }}"
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Convert debs to wheels and add to wheelhouse
+  include: deb-plugin.yml
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Add source tarballs to wheelhouse
+  include: src-plugin.yml
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Add wheels to wheelhouse
+  include: whl-plugin.yml
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Get temp contents
+  command: find -L {{ wheelhouse }} -type f -printf "%p "
+  register: search_result
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Warn if wheelhouse is empty
+  debug:
+    msg: "Warning: No content to install found."
+  when: search_result.stdout == ''
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Import content for hLinux
+  include: _venv-import.yml
+  vars:
+    distro: debian
+  when: "'debian' in distro_list and search_result.stdout != ''"
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Import content for RHEL
+  include: _venv-import.yml
+  vars:
+    distro: redhat
+  when: (third_party_rhel_enabled | default(false) | bool) and
+        "'redhat' in distro_list and search_result.stdout != ''"
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Import content for SLES
+  include: _venv-import.yml
+  vars:
+    distro: sles
+  when: (third_party_sles_enabled | default(false) | bool) and
+        "'suse' in distro_list and search_result.stdout != ''"
+
+- name: thirdparty-venv | create-thirdparty-venvs |
+        Remove scratch directory
+  become: yes
+  file:
+    path: "{{ wheelhouse }}"
+    state: absent

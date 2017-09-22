@@ -1,0 +1,47 @@
+#
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+- hosts: resources
+  roles:
+    - ardana-upgrade-tools
+
+  tasks:
+    - name: ssh-pre-upgrade | Include vars from ardana-upgrade-tools role
+      include_vars: roles/ardana-upgrade-tools/defaults/main.yml
+
+    - name: ssh-pre-upgrade | Get kernel version
+      shell: uname -r | grep "^4[.]4[.].*"
+      register: kernel_version_result
+      failed_when: false
+
+    - name: ssh-pre-upgrade | Is kernel version <= 4.4.7-1-amd64-hpelinux
+      set_fact:
+        version_is_leq: "{{ kernel_version_result.stdout |
+                          version_compare('4.4.7-1-amd64-hpelinux', '<=') }}"
+      when: (kernel_version_result | success)
+
+    - name: ssh-pre-upgrade | Is SSH to be updated
+      set_fact:
+        ssh_update_required: "{{ (version_is_leq | default(false)) and
+                              'ssh' in list_pkg_upgrades_base }}"
+
+    - name: ssh-pre-upgrade | Disable restarting of ssh when package upgrades
+      become: yes # noqa
+      service_restart:
+        service: ssh
+        state: disabled
+      when: (ssh_update_required | bool)

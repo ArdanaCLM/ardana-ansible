@@ -1,0 +1,58 @@
+{#
+#
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+#}
+# This is reverse order to ardana-deploy.yml and ardana-start.yml
+freezer-stop
+ceph-stop
+ceilometer-stop
+logging-stop
+# missing horizon-stop
+heat-stop
+ironic-stop
+eon-stop
+designate-stop
+powerdns-stop
+bind-stop
+cinder-stop
+neutron-stop
+glance-stop
+vsa-stop
+cmc-stop
+magnum-stop
+nova-stop
+octavia-stop
+swift-stop
+monasca-transform-stop
+spark-stop
+monasca-stop
+zookeeper-stop
+ardana-service-stop
+ops-console-stop
+barbican-stop
+keystone-stop
+memcached-stop
+FND-AP2-stop
+FND-CLU-stop
+rabbitmq-stop
+  vars:
+    rabbitmq_do_not_reset_node: true
+percona-stop
+#tls-stop
+monasca-agent-stop
+
+ardana-extra-stop

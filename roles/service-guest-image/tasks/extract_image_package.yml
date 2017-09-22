@@ -1,0 +1,32 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+- name: service-guest-image | extract_guest-image | create temporary directory
+  command: mktemp -d
+  register: src_guest_image_tempdir
+
+- name: service-guest-image | extract_guest-image | extract archive
+  unarchive: src={{ service_package }} dest={{ src_guest_image_tempdir.stdout }}
+
+- name: service-guest-image | extract_guest-image | get manifest file name
+  shell: ls {{ src_guest_image_tempdir.stdout }}/*.yml
+  register: manifest_file_name
+
+- name: service-guest-image | extract_guest-image | load guest-image metadata
+  include_vars: "{{manifest_file_name.stdout}}"
+  register: guest_image_metadata

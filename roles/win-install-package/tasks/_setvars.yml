@@ -1,0 +1,44 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+- name: win-install-package | _setvars | Get the system environment variables
+  raw: "powershell [Environment]::GetEnvironmentVariable('ProgramFiles')"
+  register: win_env_result
+
+- name: win-install-package | _setvars | Create log folder
+  win_file:
+    path: "{{ win_log_file_location }}"
+    state: directory
+
+- name: win-install-package | _setvars | Get log file absolute path
+  raw: powershell ((Resolve-Path -path "{{ win_log_file_location }}").path)
+  register: win_log_path_result
+
+- name: win-install-package | _setvars | setting programfiles path as fact
+  set_fact:
+    win_programfiles_path: "{{ win_env_result.stdout.split('\\r\n')[0] }}"
+
+- name: win-install-package | _setvars | setting folder paths as facts
+  set_fact:
+    win_ardana_dir: "{{ [win_programfiles_path, win_dir_path] |
+        join(path_separator) }}"
+    win_cache_dir: "{{ [win_programfiles_path, win_cache_path] |
+        join(path_separator) }}"
+    win_packager_conf_dir: "{{ [win_programfiles_path, win_pkg_conf_path] |
+        join(path_separator) }}"
+    win_log_file_location: "{{ win_log_path_result.stdout_lines[0] }}"

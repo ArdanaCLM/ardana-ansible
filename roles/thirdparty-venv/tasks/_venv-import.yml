@@ -1,0 +1,52 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+
+- name: thirdparty-venv | _venv-import |
+        Get base version of latest unpatched venv
+  set_fact:
+    target_version: >
+      {{ pkg_manifests[distro] | package_max_unpatched_version(parent) }}
+  when: pkg_manifests[distro] != ""
+
+- name: thirdparty-venv | _venv-import |
+        Get next patch number for this venv
+  set_fact:
+    next_patch: >
+      {{ pkg_manifests[distro] | package_next_patch_number(service, target_version) | default(1, true) }}
+  when: pkg_manifests[distro] != ""
+
+- name: thirdparty-venv | _venv-import |
+        Get parent venv
+  set_fact:
+    parent_venv_loc: >
+      {{ pkg_locs[distro] }}/{{ (pkg_manifests[distro] |
+         package_get_details(parent, target_version))['file'] }}
+  when: pkg_manifests[distro] != "" and
+        (pkg_manifests[distro] |
+          package_get_details(parent, target_version)) is not none
+
+- name: thirdparty-venv | _venv-import |
+        Create new service venv
+  become: yes
+  venv_edit:
+    name: "{{ service }}"
+    src: "{{ parent_venv_loc | default(omit) }}"
+    dest: "{{ pkg_locs[distro] }}"
+    wheelhouse: "{{ driver_deps_dir | default(omit) }}"
+    wheels: "{{ search_result.stdout }}"
+    version: "{{ ardana_version[4:] }}"
+    patch: "{{ next_patch | default(1, true) }}"

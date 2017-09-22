@@ -1,0 +1,47 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+- name: thirdparty-venv | setup | load services.yml files
+  set_fact:
+    all_venvs:
+      driver: "{{ item.split('/')[-4] }}"
+      venv_id: "{{ item.split('/')[-2] }}"
+      services: >
+        {{ (lookup('template',
+           third_party_root_dir+'/'+item.split('/')[-4]+'/venvs/'+item.split('/')[-2]+'/services.yml') |
+           from_yaml).services }}
+  register: venvs_result
+  with_items:
+    - "{{ drivers }}"
+
+- name: thirdparty-venv | setup | Set all_venvs fact
+  set_fact:
+    all_venvs: >
+      {{ venvs_result.results | map(attribute='ansible_facts.all_venvs') | list }}
+
+- name: thirdparty-venv | setup | setup parallel workers per driver
+  add_host:
+    name: task-venvedit-{{ item.0.driver }}-{{ item.0.venv_id }}-{{ item.1.name }}
+    hostname: "{{ inventory_hostname }}"
+    groups: parallel_venvedit
+    driver: "{{ item.0.driver }}"
+    venv_id: "{{ item.0.venv_id }}"
+    service: "{{ item.1.name }}"
+    parent: "{{ item.1.parent | default(item.1.name) }}"
+    parent_explicit: "{{ item.1.parent is defined }}"
+  with_subelements:
+    - "{{ all_venvs | default([]) }}"
+    - services

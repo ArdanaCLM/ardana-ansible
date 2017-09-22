@@ -1,0 +1,46 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+
+# Import third-party plugin code into existing Ardana OpenStack service venvs
+# and publish to the venv repo on the deployer.
+---
+
+- hosts: localhost
+  connection: local
+  roles:
+    - deployer-setup
+    - third-party
+    - git-operations
+  tasks:
+    - name: _third-party-import-venv | Get ardana version
+      include_vars: "{{ playbook_dir }}/ardana_version.yml"
+    - name: _third-party-import-venv | Get list of third-party venvs
+      shell: ls -d1 -- {{ third_party_root_dir }}/{{ third_party_venvs_dir_glob }}
+      register: venv_list_result
+      failed_when: venv_list_result.rc == 1
+    - include: roles/thirdparty-venv/tasks/setup.yml
+      vars:
+        drivers: "{{ venv_list_result.stdout_lines }}"
+      when: venv_list_result.rc == 0
+
+- hosts: parallel_venvedit
+  connection: local
+  roles:
+    - third-party
+    - thirdparty-venv
+  tasks:
+    - include: roles/thirdparty-venv/tasks/create-thirdparty-venvs.yml

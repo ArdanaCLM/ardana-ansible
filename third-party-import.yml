@@ -1,0 +1,42 @@
+#
+# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Top-level playbook for importing third-party content
+---
+
+- include: distro-list.yml
+- include: _third-party-import-debian-pkgs.yml
+- include: _third-party-import-rhel-pkgs.yml
+  when: third_party_rhel_enabled | default(false) | bool
+- include: _third-party-import-sles-pkgs.yml
+  when: third_party_sles_enabled | default(false) | bool
+- include: _third-party-import-services.yml
+- include: _third-party-import-ansible.yml
+- include: _third-party-import-other.yml
+- include: _third-party-import-venvs.yml
+- include: _third-party-import-log-profiles.yml
+- hosts: localhost
+  connection: local
+  roles:
+    - venv-editor
+    - package-constants
+  tasks:
+    - include: roles/venv-editor/tasks/update-index.yml
+      vars:
+        destination:
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.hlinux }}/"
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.rhel }}/"
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.sles }}/"

@@ -1,0 +1,17 @@
+# Manifest for: {{ content_name }}
+---
+
+# Ardana environment
+environment:
+{% for line in _venv_lsb_release_result.stdout_lines %}
+  {{ line | lower | regex_replace('\t', ' ') |
+     regex_replace('(distributor) (id:)', '\\1_\\2') |
+     regex_replace('(description: )(.*)', '\\1"\\2"') |
+     lower }}
+{% endfor %}
+
+# External files
+external: |
+{% for line in sha256_result.stdout_lines %}
+{{ line | indent(2, true) }}
+{% endfor %}

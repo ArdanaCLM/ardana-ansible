@@ -1,0 +1,81 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+- hosts: resources
+  force_handlers: yes
+  tasks:
+    # This is a workaround to the problem where the hpssacli package will not
+    # upgrade while hpssacli is currently in use. Several services periodically
+    # call hpssacli to check storage health. If run during the upgrade process
+    # this can result in the hpssacli upgrqade failing
+    # Note: As we do not own the packaging of hpssacli we turning off the
+    #       execute bit via mode bits for robustness.
+    - name: _hpssacli_pre_upgrade | Check hpssacli exists
+      stat:
+        path: /usr/sbin/hpssacli
+      register: hpssacli_stat_result
+
+    - name: _hpssacli_pre_upgrade | Disable hpssacli
+      become: yes # noqa
+      file:
+        path: /usr/sbin/hpssacli
+        mode: "u-x"
+      when: (ansible_os_family | lower) == 'debian' and
+            hpssacli_stat_result.stat.exists
+      notify:
+        - fix_hpssacli_mode
+      tags:
+        - skip_ansible_lint
+
+    - name: _hpssacli_pre_upgrade | Kill hpssacli if it is running
+      become: yes # noqa
+      shell: pkill -9 -x hpssacli 2>&1
+      when: hpssacli_stat_result.stat.exists
+      failed_when: false
+
+    - name: _hpssacli_pre_upgrade | Explicitly upgrade hpssacli
+      become: yes # noqa
+      apt:
+        name: hpssacli
+        state: latest
+        force: yes
+        dpkg_options: force-overwrite,force-confdef,force-confold
+      when: (ansible_os_family | lower) == 'debian' and
+            hpssacli_stat_result.stat.exists
+
+    # Ok, this may be paranoid but explicitly re-enable hpssacli as well as
+    # having the handler re-enable hpssacli
+    - name: _hpssacli_pre_upgrade | Enable hpssacli
+      become: yes # noqa
+      file:
+        path: /usr/sbin/hpssacli
+        mode: "u+x"
+      when: (ansible_os_family | lower) == 'debian' and
+            hpssacli_stat_result.stat.exists
+      tags:
+        - skip_ansible_lint
+
+  handlers:
+    - name: fix_hpssacli_mode
+      become: yes # noqa
+      file:
+        path: /usr/sbin/hpssacli
+        mode: "u+x"
+      when: (ansible_os_family | lower) == 'debian' and
+            hpssacli_stat_result.stat.exists
+      tags:
+        - skip_ansible_lint

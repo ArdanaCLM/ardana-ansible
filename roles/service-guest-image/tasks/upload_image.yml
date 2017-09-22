@@ -1,0 +1,89 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+# check for existing images with matching name to the new image
+- name: upload-image | get_image_from_glance | get list of image ids
+  shell: "{{ GLANCE_CLIENT }} image-list | grep {{ IMAGE_NAME }}_{{ PRODUCT }}| tr -d ' ' | cut -f 2 -d '|'"
+  environment: &OS_ENV
+    OS_AUTH_URL: "{{ openstack_auth_url }}"
+    OS_ENDPOINT_TYPE: "{{ openstack_endpoint_type }}"
+    OS_USER_DOMAIN_NAME: "{{ openstack_user_domain_name }}"
+    OS_USERNAME: "{{ openstack_username }}"
+    OS_PASSWORD: "{{ openstack_password }}"
+    OS_PROJECT_DOMAIN_NAME: "{{ openstack_project_domain_name }}"
+    OS_PROJECT_NAME: "{{ openstack_project_name }}"
+  register: image_id_list
+  run_once: true
+
+# if there is a match get the checksum, id and status for the image
+- name: upload-image | get_image_from_glance | get image details for matched ids
+  shell: "{{ GLANCE_CLIENT }} image-show {{ item}} | tr -d ' ' | egrep '(checksum|id|status)'"
+  environment: *OS_ENV
+  with_items: "{{image_id_list.stdout_lines}}"
+  when: item != ""
+  register: image_details
+  run_once: true
+
+# get the md5sum for the new image
+- name: upload-image | get_image_from_glance | get checksum for new image
+  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2 | cut -d ' ' -f 1"
+  register: image_checksum
+  when: image_id_list.stdout != "" and image_details.results|length > 0
+  run_once: true
+
+# verify if the md5sum match and if the image is in ACTIVE status
+- name: upload-image | get_image_from_glance | verify image checksum and status
+  shell: "echo '{{ item.stdout }}' | grep id | cut -d '|' -f 3"
+  with_items: "{{ image_details.results if image_id_list.stdout != '' and image_details.results|length > 0 else []}}"
+  when: item.stdout != "" and image_checksum.stdout != "" and "|checksum|{{image_checksum.stdout}}" in "{{item.stdout}}" and "|status|active|" in "{{item.stdout}}"
+  register: matched_image_ids
+  run_once: true
+
+# Use the id of the first image which matches the checksum
+- name: upload-image | get_image_from_glance | get the image id
+  shell: "echo {{ item.stdout }}"
+  with_items: "{{ matched_image_ids.results | default([])}}"
+  when: matched_image_ids is defined and not item|skipped and matched_image_ids.changed ==true and matched_image_ids.results|length > 0
+  register: image_id_from_glance_lookup
+  run_once: true
+
+# export the matched image id from glance lookup to be used in service configuration
+- name: upload-image | get_image_from_glance | use image id from glance lookup
+  set_fact:
+    service_guest_image_id: "{{ item }}"
+  with_items: "{{image_id_from_glance_lookup.results | default([])}}"
+  when: image_id_from_glance_lookup is defined and not item|skipped and image_id_from_glance_lookup.changed == true
+  run_once: true
+
+# upload new image in glance, if current image is not found in glance
+- name: upload-image | upload_image | Upload new datastore images
+  shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}_{{ PRODUCT }}
+  --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2
+  --container-format bare --disk-format qcow2
+  --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
+  register: image_id_from_glance_upload
+  environment: *OS_ENV
+  when: image_id_from_glance_lookup.changed == false
+  run_once: true
+
+# if the image upload was done then export the new image id to be used in service configuration
+- name: upload-image | get_image_from_glance | use image id from glance upload
+  set_fact:
+    service_guest_image_id: "{{image_id_from_glance_upload}}"
+  when: image_id_from_glance_lookup.changed == false and image_id_from_glance_upload.stdout != ""
+  run_once: true

@@ -1,0 +1,58 @@
+# (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Unpack an arbitrary venv into /opt/stack/venv.
+#
+# Parameters:
+#   name: (optional) name of the produced venv. Required if source omitted.
+#   source: (optional) path to the venv tarball
+#   destination: (optional) directory to save the new venv tarball
+#   wheelhouse: directory containing new wheels to install
+#   wheels: space-separated list of wheels to install
+#   version: (optional) version string for produced venv
+#   patch: (optional) override default new patch number
+#
+# (At least one required of source and destination. If no source given,
+#  name must be specified.)
+# (The destination will be computed automatically by default)
+---
+
+- hosts: localhost
+  connection: local
+  pre_tasks:
+    - fail:
+        msg: |
+          Please define the following parameters:
+            name: (optional) name of the produced venv. Required if source omitted
+            source: (optional) path to the venv tarball
+            destination: (optional) directory to save the new venv tarball
+            wheelhouse: directory containing new wheels to install
+            wheels: space-separated list of wheels to install
+            version: (optional) version string for produced venv
+            patch: (optional) new patch version for edited venv (eg. 001)
+      when: not (wheelhouse is defined and wheels is defined and
+                  (source is defined or
+                  (destination is defined and name is defined)))
+  tasks:
+    - include_vars: "{{ playbook_dir }}/ardana_version.yml"
+    - venv_edit:
+        name: "{{ name | default(omit) }}"
+        src: "{{ source | default(omit) }}"
+        dest: "{{ destination | default(omit) }}"
+        wheelhouse: "{{ wheelhouse }}"
+        wheels: "{{ wheels }}"
+        version: "{{ version | default(ardana_version) }}"
+        patch: "{{ patch | default(omit) }}"
+      become: yes

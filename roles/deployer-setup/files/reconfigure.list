@@ -1,0 +1,62 @@
+{#
+#
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+#}
+network_interface-reconfigure
+osconfig-iptables-reconfigure
+tls-reconfigure
+monasca-agent-reconfigure
+percona-reconfigure
+rabbitmq-reconfigure
+  vars:
+    rabbitmq_config_lock: false
+FND-CLU-reconfigure
+FND-AP2-reconfigure
+memcached-reconfigure
+keystone-reconfigure
+barbican-reconfigure
+zookeeper-reconfigure
+monasca-reconfigure
+ops-console-reconfigure
+spark-reconfigure
+monasca-transform-reconfigure
+eon-reconfigure
+swift-reconfigure
+glance-reconfigure
+neutron-reconfigure
+ironic-reconfigure
+nova-reconfigure
+magnum-reconfigure
+cinder-reconfigure
+octavia-reconfigure
+designate-reconfigure
+powerdns-reconfigure
+bind-reconfigure
+heat-reconfigure
+horizon-reconfigure
+kronos-reconfigure
+ceilometer-reconfigure
+ceilometer-pipeline-reconfigure
+ceph-reconfigure
+vsa-reconfigure
+freezer-reconfigure
+tempest-reconfigure
+
+# Post Reconfiguration tasks
+rabbitmq-reconfigure
+  vars:
+    rabbitmq_config_lock: false

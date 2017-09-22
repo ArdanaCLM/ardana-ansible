@@ -1,0 +1,109 @@
+#
+# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# install openstack clients to remote and localhost
+---
+#TODO: Ansible V2 May be able to use with_items on includes to clean this up
+
+# openstack-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: OPN-CLI
+    install_package: "{{ OPN_CLI.vars.openstack_client }}"
+
+# ceilometer-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: CEI-CLI
+    install_package: "{{ CEI_CLI.vars.ceilometer_client }}"
+
+# cinder-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: CND-CLI
+    install_package: "{{ CND_CLI.vars.cinder_client }}"
+
+# designate-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: DES-CLI
+    install_package: "{{ DES_CLI.vars.designate_client }}"
+
+# eon-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: EON-CLI
+    install_package: "{{ EON_CLI.vars.eon_client }}"
+
+# glance-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: GLA-CLI
+    install_package: "{{ GLA_CLI.vars.glance_client }}"
+
+# heat-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: HEA-CLI
+    install_package: "{{ HEA_CLI.vars.heat_client }}"
+
+# ironic-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: IRN-CLI
+    install_package: "{{ IRN_CLI.vars.ironic_client }}"
+
+# keystone-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: KEY-CLI
+    install_package: "{{ KEY_CLI.vars.keystone_client }}"
+
+# neutron-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: NEU-CLI
+    install_package: "{{ NEU_CLI.vars.neutron_client }}"
+
+# nova-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: NOV-CLI
+    install_package: "{{ NOV_CLI.vars.nova_client }}"
+
+# swift-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: SWF-CLI
+    install_package: "{{ SWF_CLI.vars.swift_client }}"
+
+# monasca-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: MON-CLI
+    install_package: "{{ MON_CLI.vars.monasca_client }}"
+
+# barbican-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: KEYMGR-CLI
+    install_package: "{{ KEYMGR_CLI.vars.barbican_client }}"
+
+# magnum-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: MAG-CLI
+    install_package: "{{ MAG_CLI.vars.magnum_client }}"

@@ -1,0 +1,63 @@
+#
+# (c) Copyright 2015,2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Playbook to apply the available system package upgrades
+---
+- hosts: resources
+  tasks:
+  - name: _ardana-upgrade-base | Get set of installed pkgs before upgrade
+    dpkg_list:
+    when: ansible_os_family | lower == 'debian'
+
+  - name: _ardana-upgrade-base | Set pre_upgrade_pkgs fact
+    set_fact:
+      ardana_pre_upgrade_pkgs: "{{ installed_pkgs | default([]) }}"
+
+  - name: _ardana-upgrade-base | Print list of pkgs available for upgrade
+    debug:
+      msg: "Packages available for upgrade: {{ list_pkg_upgrades_base | default([]) }}"
+
+  - name: _ardana-upgrade-base | Apply package updates
+    become: yes
+    apt:
+      upgrade: full
+      force: yes
+      dpkg_options: force-overwrite,force-confdef,force-confold
+    when: ansible_os_family | lower == 'debian'
+
+  # Upgrade from 2.x to 3.0 need to 'cleanup' the /etc/init.d/openvswitch-switch
+  # which was customized in 2.x
+  - name: _ardana-upgrade-base | Determine if openvswitch-switch script needs cleanup
+    stat:
+      path: /etc/init.d/openvswitch-switch.dpkg-dist
+    register: new_openvswitch_switch
+
+  - name: _ardana-upgrade-base | Put new openvswitch-switch init script in place
+    become: yes
+    command:  mv /etc/init.d/openvswitch-switch.dpkg-dist /etc/init.d/openvswitch-switch
+    when: new_openvswitch_switch.stat.exists
+
+  - name: _ardana-upgrade-base | Get set of installed pkgs after upgrade
+    dpkg_list:
+    when: ansible_os_family | lower == 'debian'
+
+  - name: _ardana-upgrade-base | Set post_upgrade_pkgs fact
+    set_fact:
+      ardana_post_upgrade_pkgs: "{{ installed_pkgs | default([]) }}"
+
+  - name: _ardana-upgrade-base | Set fact with full set of upgraded pkgs
+    set_fact:
+      ardana_upgraded_pkgs: "{{ ardana_pre_upgrade_pkgs | upgraded_pkgs(ardana_post_upgrade_pkgs) }}"

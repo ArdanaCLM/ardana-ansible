@@ -1,0 +1,65 @@
+#
+# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+third_party_pkgs_dir: "pkgs"
+third_party_debian_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/debian/*"
+third_party_rhel_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/rhel/*"
+third_party_sles_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/sles/*"
+
+third_party_ansible_dir: "ansible"
+third_party_ansible_dir_glob: "*/{{ third_party_ansible_dir }}"
+main_repo_ansible_dir: "{{ ardanauser_home }}/openstack/ardana/{{ third_party_ansible_dir }}"
+main_repo_config_dir: "{{ ardanauser_home }}/openstack/my_cloud/config"
+
+third_party_services_dir: "services"
+third_party_services_dir_glob: "*/{{ third_party_services_dir }}/*"
+main_repo_services_dir: "{{ ardanauser_home }}/openstack/ardana/{{ third_party_services_dir }}"
+
+third_party_other_dir: "other"
+third_party_other_dir_glob: "*/{{ third_party_other_dir }}/*/"
+
+third_party_venvs_dir: "venvs"
+third_party_venvs_dir_glob: "*/{{ third_party_venvs_dir }}/*/"
+
+third_party_logging_dir: "logging"
+third_party_logging_dir_glob: "*/{{ third_party_logging_dir }}/*"
+main_repo_logging_dir: "{{ ardanauser_home }}/openstack/my_cloud/config/logging/vars"
+
+third_party_scratch_dir: "{{ ardanauser_home }}/scratch/.third_party"
+
+venv_locs:
+  debian: hlinux_venv
+  redhat: rhel_venv
+  suse: sles_venv
+
+distro_list: "{{ hostvars['localhost']['distro_list'] }}"
+
+pkg_locs:
+  debian: "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.hlinux }}"
+  redhat:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.rhel }}"
+  suse:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.sles }}"
+
+pkg_manifests:
+  debian: "{{ (pkg_locs.debian + '/packages') | load_packages() }}"
+  redhat: "{{ (pkg_locs.redhat + '/packages') | load_packages() }}"
+  suse: "{{ (pkg_locs.suse + '/packages') | load_packages() }}"
+
+base_manifests:
+  debian: "{{ (pkg_locs.debian + '/base_packages') | load_packages() }}"
+  redhat: "{{ (pkg_locs.redhat + '/base_packages') | load_packages() }}"
+  suse: "{{ (pkg_locs.suse + '/base_packages') | load_packages() }}"

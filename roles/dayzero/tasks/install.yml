@@ -1,0 +1,94 @@
+#
+# (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Playbook for setting up the Day Zero UI on the deployer
+---
+
+- name: dayzero | install | Clear old directory
+  become: yes
+  file:
+    path: "{{ ardanauser_home }}/ardana-installer-ui"
+    state: absent
+
+- name: dayzero | install | Update venv cache
+  become: yes
+  install_package:
+    cache: update
+
+- name: dayzero | install | Install Day Zero UI
+  become: yes
+  install_package:
+    name: dayzero
+    service: dayzero
+    state: present
+    activate: act_on
+  notify: dayzero_change
+
+- name: dayzero | install | Extract Day Zero UI service files
+  become: yes
+  unarchive:
+    dest: "{{ ardanauser_home }}"
+    src: "{{ item }}"
+    copy: no
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    mode: 0644
+  with_fileglob:
+    - "{{ 'dayzero' | jar_dir }}/ardana-installer-ui-*.tar.gz"
+
+# Directories need to be executable for GUI to access files
+- name: dayzero | install | Set permission on directories to be executable
+  become: yes
+  command: find {{ ardanauser_home }}/ardana-installer-ui -type d -exec chmod 0755 {} +
+
+- name: dayzero | install | Extract Node.js files
+  become: yes
+  unarchive:
+    dest: "{{ ardanauser_home }}/ardana-installer-ui"
+    src: "{{ item }}"
+    copy: no
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    mode: 0755
+  with_fileglob:
+    - "{{ ardanauser_home }}/ardana-installer-ui/nodejs.tar.gz"
+
+- name: dayzero | install | Create fake venv bin directory
+  become: yes
+  file:
+    path: "{{ ardanauser_home }}/ardana-installer-ui/dayzero/venv/bin"
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    state: directory
+
+- name: dayzero | install | Setup Day Zero UI service
+  become: yes
+  setup_systemd:
+    service: dayzero
+    user: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    install_dir: "{{ ardanauser_home }}/ardana-installer-ui"
+    cmd: nodejs
+    args: >
+      server/server.js
+
+- name: dayzero | install | Symlink nodejs
+  become: yes
+  file:
+    dest: "{{ ardanauser_home }}/ardana-installer-ui/dayzero/venv/bin/nodejs"
+    src: "{{ ardanauser_home }}/ardana-installer-ui/nodejs/bin/node"
+    force: yes
+    state: link

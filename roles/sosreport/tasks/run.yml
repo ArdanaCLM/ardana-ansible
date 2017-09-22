@@ -1,0 +1,125 @@
+#
+# (c) Copyright 2015,2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Run sosreport on all the nodes
+---
+
+- name: sosreport | run | Create sosreport timestamp
+  set_fact:
+    sos_timestamp: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+
+- name: sosreport | run | Create sosreport output directory name
+  set_fact:
+    output_dir: sosreport-{{ inventory_hostname }}-{{ sos_timestamp }}
+
+- name: sosreport | run | Create sosreport output path
+  set_fact:
+    output_path: /tmp/{{ output_dir }}
+
+- name: sosreport | run | Create sosreport output directory
+  file:
+    path: "{{ output_path }}"
+    state: directory
+    mode: 0700
+
+- name: sosreport | run | Run sosreport
+  become: yes
+  command: >
+    {{ 'sos' | bin_dir }}/sosreport --quiet --batch \
+    -e {{ sosreport_plugins }} --all-logs --tmp-dir "{{ output_path }}"
+  async: "{{ timeout|default(0) }}"
+
+- name: sosreport | run | Create sosreport README
+  become: yes
+  copy:
+    content: |
+      Note: sosreport output (excluding /var/log) is in the sosreport-*.tar.gz
+      tar file.  "/var/log" output, collected separately to reduce temporary
+      disk space use, is under "var/log"
+    dest: "{{ output_path }}/README.txt"
+    mode: 0644
+
+- name: sosreport | run | Prepare to link to /var/log
+  become: yes
+  file:
+    dest: "{{ output_path }}/var"
+    state: directory
+    mode: 0700
+
+- name: sosreport | run | Link to /var/log
+  become: yes
+  file:
+    src: /var/log
+    dest: "{{ output_path }}/var/log"
+    state: link
+
+- name: sosreport | run | Create final tar file
+  become: yes
+  shell: |
+    tar --exclude='{{ output_dir}}/var/log/*/*-json.log*' \
+      --warning=no-file-changed \
+      -czphf "{{ output_path }}".tar.gz \
+      --owner "{{ ansible_env['USER'] }}" \
+      --group "{{ ansible_env['USER'] }}" \
+      -C /tmp "{{ output_dir }}"
+    RESULT=$?
+    if [ $RESULT -eq 1 ]
+    then
+        # tar produces an exit status of '1'
+        # if files are updated during
+        # tar. This is likely to happen with
+        # log files, and can be safely ignored.
+        RESULT=0
+    fi
+    exit $RESULT
+  async: "{{ timeout|default(0) }}"
+
+- name: sosreport | run | Set tar file permissions
+  become: yes
+  file:
+    path: "{{ output_path }}.tar.gz"
+    mode: 0600
+
+- name: sosreport | run | Delete temporary data (main)
+  become: yes
+  shell: |
+    rm "{{ output_path }}"/sosreport*
+    rm "{{ output_path }}"/README.txt
+    rm "{{ output_path }}"/var/log
+    rmdir "{{ output_path }}"/var
+    rmdir "{{ output_path }}"
+
+- name: sosreport | run | Create local directory for collecting sosreports
+  delegate_to: localhost
+  file:
+    path: "{{ sosreport_deployer_archives }}"
+    state: "directory"
+    mode: 0700
+  run_once: yes
+
+- name: sosreport | run | Retrieve sosreports result
+  become: yes
+  synchronize:
+    mode: pull
+    src: "{{ output_path }}.tar.gz"
+    dest: "{{ sosreport_deployer_archives }}/"
+    compress: no
+
+- name: sosreport | run | Delete per-node tar file
+  become: yes
+  file:
+    path: "{{ output_path }}.tar.gz"
+    state: absent

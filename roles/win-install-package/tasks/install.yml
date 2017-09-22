@@ -1,0 +1,43 @@
+#
+# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+- include: _setvars.yml
+
+- include: check_version.yml
+
+- name:  win-install-package | install | Download the venv zip
+  win_get_url:
+    url: "{{ build_url.url }}"
+    dest: "{{ [win_cache_dir, build_url.zip] | join(path_separator) }}"
+  when: win_service_config.stdout.find("{{ build_url.svc_dir }}") == -1
+
+- name:  win-install-package | install | Unzip the venv zip
+  win_unzip:
+    src: "{{ [win_cache_dir, build_url.zip] | join(path_separator) }}"
+    dest: "{{ [win_ardana_dir, win_service, build_url.svc_dir] |
+            join(path_separator) }}"
+    creates: "{{ [win_ardana_dir, win_service, build_url.svc_dir] |
+            join(path_separator) }}"
+  when: win_service_config.stdout.find("{{ build_url.svc_dir }}") == -1
+
+- name:  win-install-package | install | Update orig-prefix
+  win_template:
+    src: orig-prefix.txt.j2
+    dest: "{{ [win_ardana_dir, win_service, build_url.svc_dir, win_service,
+            'Lib', 'orig-prefix.txt'] | join(path_separator) }}"
+  when: win_service_config.stdout.find("{{ build_url.svc_dir }}") == -1
