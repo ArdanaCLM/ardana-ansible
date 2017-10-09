@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2015 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -38,6 +38,19 @@
 #       to: cp-ansible
 ---
 
+# git >= 2.9.0 does not allow merging unrelated histories anymore. Need to force
+# merge by providing --allow-unrelated-histories option.
+
+- name: git-operations | _promote-from-staging | Evaluate git version
+  shell: git --version
+  register: git_version_result
+
+- name: git-operations | _promote-from-staging | Prepare git-merge command line
+  set_fact:
+    git_merge_allow_unrelated_histories: "{{  git_version_result.stdout
+      | split(' ') | last | version_compare('2.9.0', '>=')
+      | ternary('--allow-unrelated-histories', '') }}"
+
 - name: git-operations | _promote-from-staging | Clear out working directory
   file:
     dest: "{{ work_dir }}"
@@ -57,7 +70,9 @@
             git clone -b {{ branch.from | quote }} {{ repo | quote }} work &&
             (
                 cd work &&
-                git merge -s ours -m "{{ merge_msg }}" origin/{{ branch.to | quote }} &&
+                git merge -s ours -m "{{ merge_msg }}" \
+                  {{ git_merge_allow_unrelated_histories }} \
+                  origin/{{ branch.to | quote }} &&
                 git branch -f {{ branch.to | quote }} &&
                 git push origin {{ branch.to | quote }} &&
                 git push origin --delete {{ branch.from | quote }}

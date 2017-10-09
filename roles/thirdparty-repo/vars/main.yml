@@ -26,7 +26,3 @@ yum_thirdparty_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ yum_thirdparty_loc }}"
 # Thirdparty ZYPP repo variables
 zypp_thirdparty_loc: "ardana/sles12/zypper/{{ repo_name }}"
 zypp_thirdparty_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ zypp_thirdparty_loc }}"
-
-thirdparty_repo_required_packages:
-  - aptly
-  - createrepo

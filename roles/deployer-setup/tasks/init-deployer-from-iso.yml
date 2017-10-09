@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -129,7 +129,7 @@
   shell: tar -rf "{{ hlinux_apt_backup_loc }}" -T {{ dupe_files_loc }}
   args:
     chdir: "{{ hlinux_apt_repo_dir }}"
-  when: package_backup_needed.stat.exists
+  when: hlinux_repo_available and package_backup_needed.stat.exists
 
 - name: deployer-setup | init-deployer-from-iso | Rsync hlinux apt repo
   sudo: yes
@@ -149,14 +149,14 @@
     src: "{{ hlinux_apt_backup_loc }}"
     dest: "{{ hlinux_apt_repo_dir }}"
     copy: no
-  when: package_backup_needed.stat.exists
+  when: hlinux_repo_available and package_backup_needed.stat.exists
 
 - name: deployer-setup | init-deployer-from-iso | Remove backup file
   become: yes
   file:
     path: "{{ hlinux_apt_backup_loc }}"
     state: absent
-  when: package_backup_needed.stat.exists
+  when: hlinux_repo_available and package_backup_needed.stat.exists
 
 - name: deployer-setup | init-deployer-from-iso | Backup iso netboot area
   sudo: yes

@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -22,6 +22,3 @@ whl_glob: "{{ plugin_dir }}/whls/*.whl"
 src_glob: "{{ plugin_dir }}/src/*"
 
 driver_deps_dir: "{{ plugin_dir }}/pip-deps/"
-
-thirdparty_venv_required_packages:
-  - virtualenv

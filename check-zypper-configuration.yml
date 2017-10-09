@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -14,12 +14,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+# Check if zypper configuration is broken
 ---
-
-- name: thirdparty-other | install | Install required packages
-  become: yes
-  package:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    thirdparty_venv_required_packages | default([])
+- hosts: localhost
+  connection: local
+  tasks:
+    - include: roles/deployer-setup/tasks/check-sles-cdrom-sources.yml

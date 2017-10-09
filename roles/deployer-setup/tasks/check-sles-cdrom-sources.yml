@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -15,11 +15,20 @@
 # under the License.
 #
 ---
+- name: deployer-setup | check-sles-cdrom-sources | Check if CD source exists
+  shell: zypper repos | grep -i sles
+  register: cd_source_result
+  failed_when: false
 
-- name: thirdparty-other | install | Install required packages
-  become: yes
-  package:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    thirdparty_venv_required_packages | default([])
+- name: deployer-setup | check-sles-cdrom-sources | Verify mounted image
+  stat:
+    path: /media/cdrom/suse
+  register: image_verify_result
+
+- name: deployer-setup | check-sles-cdrom-sources | Present error message
+  fail:
+    msg: "sles disk is not mounted."
+  when: >
+    cd_source_result.rc == 0 and
+    not image_verify_result.stat.exists
+

@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2015 Hewlett Packard Enterprise Development LP
+# (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
 # (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
@@ -22,6 +22,14 @@
     name: git
     state: present
   sudo: yes
+  when: ansible_os_family | lower != 'suse'
+
+- name: git-operations | initialise | Install required software
+  zypper:
+    name: git-core
+    state: present
+  sudo: yes
+  when: ansible_os_family | lower == 'suse'
 
 - name: git-operations | initialise | Create initial repository
   include: _initialise.yml
