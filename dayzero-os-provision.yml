@@ -27,6 +27,10 @@
 #
 ##############################################################################
 ---
+- include: pbstart.yml
+  vars:
+    playbook_name: "dayzero-os-provision.yml"
+
 - hosts: localhost
   tasks:
     - name: install-os | ready | Get failed node list
@@ -49,3 +53,6 @@
 
 - include: bm-reimage.yml
 
+- include: pbfinish.yml
+  vars:
+    playbook_name: "dayzero-os-provision.yml"
