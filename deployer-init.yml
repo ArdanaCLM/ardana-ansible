@@ -19,10 +19,20 @@
   connection: local
   roles:
     - deployer-setup
+    - osconfig
+    - thirdparty-repo
   tasks:
+    - include_vars: roles/deployer-setup/defaults/ardana_tar_locations.yml
     - include: roles/deployer-setup/tasks/install.yml
     - include: roles/deployer-setup/tasks/configure-bash.yml
     - include: roles/deployer-setup/tasks/init-third-party.yml
+    - include: roles/deployer-setup/tasks/install-sles-support.yml
+    - include: roles/osconfig/tasks/check-for-zypp-repo.yml
+      when: ansible_os_family == 'Suse'
+    - include: roles/osconfig/tasks/setup-zypp.yml
+      vars:
+          hlinux_server: "dir:{{ PACKAGE_CONSTANTS.REPO_DIR }}"
+      when: ansible_os_family == 'Suse'
 
 # Install and configure apache2 for venv and install ardana-input-model
 - hosts: localhost
@@ -67,7 +77,6 @@
     - include: roles/deployer-setup/tasks/install-input-model-contents.yml
     - include: roles/deployer-setup/tasks/install-venv-contents.yml
     - include: roles/deployer-setup/tasks/install-rhel-support.yml
-    - include: roles/deployer-setup/tasks/install-sles-support.yml
     - include: roles/deployer-setup/tasks/init-deployer-from-iso.yml
 
 # Install & configure venv application
