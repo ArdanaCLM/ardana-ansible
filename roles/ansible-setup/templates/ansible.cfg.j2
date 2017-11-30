@@ -19,7 +19,7 @@ inventory      = {{ (verb_hosts_exists.stat.exists == True) | ternary( hosts_ver
 
 # BUG 1259: replace this line with the following (commented-out)
 # one if you're disabling the Monasca API deployment.
-library        = roles/monasca-alarm-definition/library
+library        = roles/monasca-alarm-definition/library:/usr/share/ardana/ansible/library
 #library        = roles/monasca-ansible-library/noop
 
 remote_tmp     = $HOME/.ansible/tmp
