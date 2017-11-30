@@ -29,11 +29,11 @@
     - include: roles/deployer-setup/tasks/init-third-party.yml
     - include: roles/deployer-setup/tasks/install-sles-support.yml
     - include: roles/osconfig/tasks/check-for-zypp-repo.yml
-      when: ansible_os_family == 'Suse'
+      when: ansible_os_family | lower | search('suse')
     - include: roles/osconfig/tasks/setup-zypp.yml
       vars:
           zypp_server: "dir:{{ PACKAGE_CONSTANTS.REPO_DIR }}"
-      when: ansible_os_family == 'Suse'
+      when: ansible_os_family | lower | search('suse')
 
 # Install and configure apache2 for venv and install ardana-input-model
 - hosts: localhost
