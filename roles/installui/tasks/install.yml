@@ -16,6 +16,28 @@
 # Playbook for setting up the installui on the deployer
 ---
 
+- name: installui | configure | Create installui.service.d directory
+  become: yes
+  file:
+    path: "{{ systemd_config_dir }}"
+    state: directory
+
+- name: installui | configure | Create ardana installer temp directory
+  become: yes
+  file:
+    path: "{{ tmp_dir }}"
+    state: directory
+    mode: 0700
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+
+- name: installui | configure | Apply systemd template
+  become: yes
+  template:
+    src: "local.conf.j2"
+    dest: "{{ systemd_config_file }}"
+  notify: installui_change
+
 - name: installui | install | Clear old directory
   become: yes
   file:

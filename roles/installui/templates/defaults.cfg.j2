@@ -1,3 +1,4 @@
+{#
 #
 # (c) Copyright 2017 SUSE LLC
 #
@@ -13,19 +14,29 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# Playbook for configuring Install UI
----
+#}
 
-- name: installui | configure | Apply ui config
-  become: yes
-  template:
-    src: "config.json.j2"
-    dest: "{{ ui_config_file }}"
-  notify: installui_change
+[flask]
+host: {{ shim_host }}
+port: {{ shim_port }}
 
-- name: installui | post-configure | Apply shim config
-  become: yes
-  template:
-    src: "defaults.cfg.j2"
-    dest: "{{ shim_config_file }}"
-  notify: installui_change
+[general]
+db_file: {{ db_file }}
+progress_file: {{ progress_file }}
+
+[ardana]
+url: {{ ardana_service_url }}
+
+[urls]
+{% if HZN_WEB is defined -%}
+  {%- set hzn = HZN_WEB.advertises.vips.public[0] -%}
+  {%- if "://myardana.test" in HZN_WEB.advertises.vips.public[0].url -%}
+    horizon: {{ hzn.protocol }}://{{ hzn.ip_address }}:{{ hzn.port }}
+  {%- else -%}
+    horizon: {{ hzn.url }}
+  {%- endif -%}
+{%- endif %}
+
+{% if OPS_WEB is defined -%}
+  opsconsole: {{ OPS_WEB.advertises.vips.private[0].url }}
+{%- endif %}

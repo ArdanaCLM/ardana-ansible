@@ -1,3 +1,4 @@
+{#
 #
 # (c) Copyright 2017 SUSE LLC
 #
@@ -13,19 +14,8 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
-# Playbook for configuring Install UI
----
+#}
 
-- name: installui | configure | Apply ui config
-  become: yes
-  template:
-    src: "config.json.j2"
-    dest: "{{ ui_config_file }}"
-  notify: installui_change
-
-- name: installui | post-configure | Apply shim config
-  become: yes
-  template:
-    src: "defaults.cfg.j2"
-    dest: "{{ shim_config_file }}"
-  notify: installui_change
+{
+  "shimurl": "{{ shim_url }}"
+}

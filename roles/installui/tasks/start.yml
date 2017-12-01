@@ -16,7 +16,7 @@
 # Start the Install UI
 ---
 
-- name: installui | start | Restart Install UI service
+- name: installui | start | Restart Install UI service, if needed
   become: yes
   service:
     name: installui
@@ -28,3 +28,9 @@
   service:
     name: installui
     state: started
+
+- name: installui | start | Wait for Install UI service to settle
+  command: sleep 5
+
+- name: installui | start | Check again to see if the service is started
+  command: systemctl status installui
