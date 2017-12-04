@@ -74,7 +74,10 @@
     - deployer-setup
   tasks:
     - include: roles/deployer-setup/tasks/install-my-cloud-directory.yml
+    - include: roles/deployer-setup/tasks/legacy-install-input-model-contents.yml
+      when: deployer_media_legacy_layout
     - include: roles/deployer-setup/tasks/install-input-model-contents.yml
+      when: not deployer_media_legacy_layout
     - include: roles/deployer-setup/tasks/install-venv-contents.yml
     - include: roles/deployer-setup/tasks/install-rhel-support.yml
     - include: roles/deployer-setup/tasks/init-deployer-from-iso.yml

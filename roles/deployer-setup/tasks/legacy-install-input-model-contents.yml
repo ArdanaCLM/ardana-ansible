@@ -16,17 +16,25 @@
 #
 ---
 
-- name: deployer-setup | install-input-model-contents | SUSE- Install ardana input model (rpm)
-  become: true
-  zypper:
-    name: "{{ item }}"
-    state: latest
-  with_items:
-    ardana-input-model
+- include_vars: ../defaults/ardana_tar_locations.yml
+- include_vars: "{{ playbook_dir }}/ardana_version.yml"
+
+- name: deployer-setup | install-input-model-contents | Install ardana input model
+  unarchive:
+    src: "{{ ardanauser_home }}/{{ deployer_input_model_tarball }}"
+    dest: "{{ ardanauser_home }}/{{ ardana_version }}"
+    copy: no
+
+- name: deployer-setup | install-input-model-contents | List contents of ardana-input-model/2.0
+  command: find . -maxdepth 1 -type d -printf '%P\n'
+  args:
+    chdir: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0"
+  register: ardana_input_model_deployer
+  changed_when: True
 
 - name: deployer-setup | install-input-model-contents | Copy examples to ardana directory
   synchronize:
-    src: "{{ deployer_input_model_src }}/{{ item }}"
+    src: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0/{{ item }}"
     dest: "{{ git_operations_staging_directory }}"
     delete: yes
     copy_links: yes
