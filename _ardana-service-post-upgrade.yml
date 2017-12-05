@@ -39,12 +39,10 @@
 #- include: designate-post-upgrade.yml
 #- include: powerdns-post-upgrade.yml
 #- include: bind-post-upgrade.yml
-#- include: eon-post-upgrade.yml
 #- include: ironic-post-upgrade.yml
 #- include: heat-post-upgrade.yml
 #- include: horizon-post-upgrade.yml
 #- include: logging-post-upgrade.yml
 #- include: ceilometer-post-upgrade.yml
-- include: ceph-post-upgrade.yml
 #- include: freezer-post-upgrade.yml
 #- include: tempest-post-upgrade.yml

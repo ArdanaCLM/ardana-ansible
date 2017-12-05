@@ -16,7 +16,6 @@
 # under the License.
 #
 #}
-ardana-hypervisor-vms-start
 monasca-agent-start
 percona-start
 rabbitmq-start
@@ -32,8 +31,6 @@ monasca-start
 spark-start
 monasca-transform-start
 swift-start
-vsa-start
-cmc-start
 nova-start
 magnum-start
 glance-start
@@ -43,12 +40,10 @@ octavia-start
 designate-start
 powerdns-start
 bind-start
-eon-start
 ironic-start
 heat-start
 horizon-start
 logging-start
 ceilometer-start
-ceph-start
 freezer-start
 ardana-extra-start

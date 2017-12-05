@@ -23,9 +23,7 @@ sosreport_deployer_archives: "/tmp/sosreport-report-archives"
 sosreport_base_dir: "{{ 'sos' | jar_dir }}/python2.7/site-packages/sos"
 
 sosreport_plugins: "
-ceph,\
 corosync,\
-eon,\
 ardana,\
 hpasm,\
 iscsitarget,\

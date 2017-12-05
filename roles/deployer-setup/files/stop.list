@@ -18,21 +18,17 @@
 #}
 # This is reverse order to ardana-deploy.yml and ardana-start.yml
 freezer-stop
-ceph-stop
 ceilometer-stop
 logging-stop
 # missing horizon-stop
 heat-stop
 ironic-stop
-eon-stop
 designate-stop
 powerdns-stop
 bind-stop
 cinder-stop
 neutron-stop
 glance-stop
-vsa-stop
-cmc-stop
 magnum-stop
 nova-stop
 octavia-stop

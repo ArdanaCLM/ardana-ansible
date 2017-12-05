@@ -16,7 +16,6 @@
 # under the License.
 #
 #}
-ardana-hypervisor-upgrade
 sosreport-upgrade
 monasca-agent-upgrade
 # Update Monasca agent for RabbitMQ.
@@ -35,9 +34,6 @@ ops-console-upgrade
 spark-upgrade
 monasca-transform-upgrade
 swift-upgrade
-vsa-upgrade
-cmc-upgrade
-eon-upgrade
 nova-upgrade
 magnum-upgrade
 glance-upgrade
@@ -52,7 +48,6 @@ heat-upgrade
 horizon-upgrade
 logging-upgrade
 ceilometer-upgrade
-ceph-upgrade
 freezer-upgrade
 tempest-upgrade
 sherpa-remove

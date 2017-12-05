@@ -24,7 +24,6 @@
       - ceilometer
       - cinder
       - designate
-      - eon
       - glance
       - heat
       - ironic

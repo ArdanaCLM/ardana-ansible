@@ -18,8 +18,6 @@
 #}
 # TODO: There is no osconfig-status yet
 #osconfig-status
-ardana-hypervisor-status
-ardana-hypervisor-vms-status
 monasca-agent-status
 percona-status
 rabbitmq-status
@@ -36,8 +34,6 @@ spark-status
 monasca-transform-status
 swift-status
 ironic-status
-vsa-status
-cmc-status
 nova-status
 magnum-status
 glance-status
@@ -47,11 +43,9 @@ octavia-status
 designate-status
 powerdns-status
 bind-status
-eon-status
 heat-status
 horizon-status
 logging-status
 #ceilometer-status
-ceph-status
 freezer-status
 ardana-extra-status
