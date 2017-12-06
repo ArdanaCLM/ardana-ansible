@@ -28,5 +28,4 @@
   - action: setup
 
 - include: ardana-deploy.yml
-- include: dayzero-stop.yml
 - include: ardana-status.yml

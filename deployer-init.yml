@@ -119,8 +119,5 @@
   tasks:
     - include: roles/config-processor/tasks/install.yml
 
-# Install Day Zero UI and run it
-- include: dayzero-deploy.yml
-
 # Deploy third-party import mechanism
 - include: third-party-deploy.yml
