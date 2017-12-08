@@ -31,7 +31,7 @@ keystone-deploy
 barbican-deploy
 zookeeper-deploy
 monasca-deploy
-ardana-service-deploy
+#ardana-service-deploy
 # ops console depends on kafka, installed by monasca
 ops-console-deploy
 spark-deploy
