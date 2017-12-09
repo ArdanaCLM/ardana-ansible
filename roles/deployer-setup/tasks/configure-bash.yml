@@ -16,14 +16,22 @@
 #
 # Configure the bash shell we will be working in
 ---
+- set_fact:
+    bashrc_path="{{ ansible_env.HOME }}/.bashrc"
+
+- stat: path=bashrc_path
+  register: bashrc
+
 - name: deployer-setup | configure-bash | Unset HISTCONTROL in the environment
   replace:
-    dest="{{ ansible_env.HOME }}/.bashrc"
+    dest=bashrc_path
     regexp="HISTCONTROL=[\w]*"
     replace="HISTCONTROL="
+  when: bashrc.stat.exists is defined and bashrc.stat.exists
 
 - name: deployer-setup | configure-bash | HISTCONTROL comment fixing
   replace:
-    dest="{{ ansible_env.HOME }}/.bashrc"
+    dest=bashrc_path
     regexp="don\'t put duplicate lines or lines starting with space in the history"
     replace="do not filter out any command from the history"
+  when: bashrc.stat.exists is defined and bashrc.stat.exists
