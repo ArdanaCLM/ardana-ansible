@@ -31,8 +31,7 @@ keystone-deploy
 barbican-deploy
 zookeeper-deploy
 monasca-deploy
-# TODO uncomment this when new service is properly in - choyj
-#ardana-service-deploy
+ardana-service-deploy
 # ops console depends on kafka, installed by monasca
 ops-console-deploy
 spark-deploy
