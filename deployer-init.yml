@@ -123,7 +123,7 @@
 - include: third-party-deploy.yml
 
 # Install and run Day Zero UI
-- include: installui-deploy.yml
+#- include: installui-deploy.yml
 
 # Install and run ardana-service, for which Day Zero UI is dependent on
 - include: ardana-service-deploy.yml
