@@ -25,6 +25,7 @@
 
 - name: config-processor | install | Install the Configuration Processor
   become: yes
+  when: deployer_media_legacy_layout|bool
   install_package:
     name: config_processor
     service: config-processor
@@ -53,6 +54,7 @@
     - "{{ config_processor_install.logfile_errors }}"
 
 - name: config-processor | install | Copy Configuration Processor Services into work dir
+  when: deployer_media_legacy_layout|bool
   synchronize:
     src: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0/services"
     dest: "{{ config_processor_install_ardana }}"

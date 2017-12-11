@@ -27,7 +27,7 @@ deployer_prerequisites:
 deployer_packages:
     - screen
 
-deployer_input_model_src: "{{'{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0' if deployer_media_legacy_layout|bool else '/usr/share/ardana/ansible/2.0/'}}"
+deployer_input_model_src: "{{'{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0' if deployer_media_legacy_layout|bool else '/usr/share/ardana/input-model/2.0/'}}"
 
 deployer_setup_hook_plays:
     - cloud-configure

@@ -92,8 +92,10 @@
     - package-consumer
   tasks:
     - include: roles/package-repo/tasks/install.yml
+      when: deployer_media_legacy_layout|bool
     - include: roles/package-repo/tasks/configure.yml
     - include: roles/package-consumer/tasks/install.yml
+      when: deployer_media_legacy_layout|bool
     - include: roles/package-consumer/tasks/configure.yml
       vars:
        host:
@@ -128,3 +130,4 @@
 
 # Install and run ardana-service, for which Day Zero UI is dependent on
 - include: ardana-service-deploy.yml
+  when: deployer_media_legacy_layout|bool

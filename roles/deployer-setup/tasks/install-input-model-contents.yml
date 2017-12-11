@@ -25,12 +25,17 @@
   with_items:
     - ardana-input-model
 
+- name: deployer-setup | install-input-model-contents | List contents of ardana-input-model/2.0 (rpm)
+  command: find . -maxdepth 1 -type d -printf '%P\n'
+  args:
+    chdir: "{{ deployer_input_model_src }}"
+  register: ardana_input_model_deployer
+  changed_when: True
+
 - name: deployer-setup | install-input-model-contents | Copy examples to ardana directory (rpm)
-  when: ansible_os_family == 'Suse'
   synchronize:
-    src: "{{ deployer_input_model_src }}/"
+    src: "{{ deployer_input_model_src }}/{{ item }}"
     dest: "{{ git_operations_staging_directory }}"
     delete: yes
     copy_links: yes
-    rsync_opts:
-      - "--exclude=services"
+  with_items: "{{ ardana_input_model_deployer.stdout_lines | default([]) | difference(['', 'services']) }}"

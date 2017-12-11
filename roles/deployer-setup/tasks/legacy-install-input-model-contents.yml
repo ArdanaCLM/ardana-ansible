@@ -19,20 +19,20 @@
 - include_vars: ../defaults/ardana_tar_locations.yml
 - include_vars: "{{ playbook_dir }}/ardana_version.yml"
 
-- name: deployer-setup | install-input-model-contents | Install ardana input model
+- name: deployer-setup | install-input-model-contents | Install ardana input model (legacy)
   unarchive:
     src: "{{ ardanauser_home }}/{{ deployer_input_model_tarball }}"
     dest: "{{ ardanauser_home }}/{{ ardana_version }}"
     copy: no
 
-- name: deployer-setup | install-input-model-contents | List contents of ardana-input-model/2.0
+- name: deployer-setup | install-input-model-contents | List contents of ardana-input-model/2.0 (legacy)
   command: find . -maxdepth 1 -type d -printf '%P\n'
   args:
     chdir: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0"
   register: ardana_input_model_deployer
   changed_when: True
 
-- name: deployer-setup | install-input-model-contents | Copy examples to ardana directory
+- name: deployer-setup | install-input-model-contents | Copy examples to ardana directory (legacy)
   synchronize:
     src: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0/{{ item }}"
     dest: "{{ git_operations_staging_directory }}"

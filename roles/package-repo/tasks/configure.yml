@@ -28,6 +28,6 @@
     ./create_index
     --dir={{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ item.item.value }}
   args:
-    chdir: "{{ 'packager' | bin_dir }}"
+    chdir: "{{ 'packager' | bin_dir if deployer_media_legacy_layout|bool else '/usr/bin/' }}"
   when: item.stat.exists
   with_items: _venv_present_result.results
