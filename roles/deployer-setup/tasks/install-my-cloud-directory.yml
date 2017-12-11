@@ -36,3 +36,4 @@
     src: "{{ ardanauser_home }}/{{ deployer_config_tarball }}"
     dest: "{{ git_operations_staging_directory }}/my_cloud/config"
     copy: no
+  when: deployer_media_legacy_layout|bool
