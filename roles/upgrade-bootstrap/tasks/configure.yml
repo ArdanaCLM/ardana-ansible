@@ -17,7 +17,7 @@
 ---
 
 - name: Configure policy-rc.d defaults
-  sudo: yes
+  become: true
   template:
      src: policy-rc.d.default
      dest: /etc/default/policy-rc.d
@@ -26,7 +26,7 @@
      mode: 0644
 
 - name: Configure /usr/sbin/policy-rc.d
-  sudo: yes
+  become: true
   template:
      src: policy-rc.d
      dest: /usr/sbin/policy-rc.d
