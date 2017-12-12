@@ -18,7 +18,7 @@ class CallbackModule(object):
 
     def updateSrvcUrl(self):
         hosts = self.playbook.inventory.get_hosts()
-        if(hosts is not None):
+        if(hosts):
             try:
                 host_vars = \
                     self.playbook.inventory.get_variables(hosts[0].name)
