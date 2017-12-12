@@ -57,22 +57,22 @@
   set_fact: cmc32_repo_available={{ cmc32_apt_tarball is defined }}
 
 - name: deployer-setup | init-deployer-from-iso | Add apt proxy config for local repo
-  sudo: yes
+  become: true
   copy: src=06apt-hlinux.conf dest=/etc/apt/apt.conf.d/06apt-hlinux.conf
   when: hlinux_repo_available or cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Install dpkg-dev
-  sudo: yes
+  become: true
   apt: name=dpkg-dev state=present
   when: hlinux_repo_available or cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Create cmc32 apt repo directory
-  sudo: yes
+  become: true
   file: path={{ cmc32_apt_repo_dir }} state=directory mode=0755
   when: cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Populate cmc32 repo
-  sudo: yes
+  become: true
   # I have to use tar here because the tarball has an extra directory level
   # embedded in it and the unarchive module can't do "strip".
   command: tar xf {{ cmc32_apt_tarball }} --strip-components=1
@@ -81,7 +81,7 @@
   when: cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Remove old sources.list.d files
-  sudo: yes
+  become: true
   file:
     path: "{{ item }}"
     state: absent
@@ -90,22 +90,22 @@
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Fix cmc32 file permissions
-  sudo: yes
+  become: true
   file: path={{ cmc32_apt_repo_dir }} owner=root group=root mode="a-w,a+r" state=directory recurse=yes
   when: cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Add cmc32 repo to sources.list
-  sudo: yes
+  become: true
   apt_repository: repo={{ cmc32_repo_source }} state=present
   when: cmc32_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Create hlinux apt repo directory
-  sudo: yes
+  become: true
   file: path={{ hlinux_apt_repo_dir }} state=directory mode=0755
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Create foreign apt repo directory
-  sudo: yes
+  become: true
   file: path={{ foreign_apt_repo_dir }} state=directory mode=0755
   when: hlinux_repo_available
 
@@ -114,7 +114,7 @@
   register: hlinux_ident_file
 
 - name: deployer-setup | init-deployer-from-iso | Copy ident file
-  sudo: yes
+  become: true
   copy: src={{ hlinux_apt_repo_loc }}/.disk/info dest={{ hlinux_apt_repo_dir }}/info
   when: hlinux_ident_file.stat.exists
 
@@ -132,7 +132,7 @@
   when: hlinux_repo_available and package_backup_needed.stat.exists
 
 - name: deployer-setup | init-deployer-from-iso | Rsync hlinux apt repo
-  sudo: yes
+  become: true
   synchronize:
     src: "{{ hlinux_apt_repo_loc }}/{{ item }}"
     dest: "{{ hlinux_apt_repo_dir }}"
@@ -159,7 +159,7 @@
   when: hlinux_repo_available and package_backup_needed.stat.exists
 
 - name: deployer-setup | init-deployer-from-iso | Backup iso netboot area
-  sudo: yes
+  become: true
   synchronize:
     src: "{{ hlinux_apt_repo_dir }}/dists/{{ hlinux_distro }}/main/installer-amd64/current/images/netboot"
     dest: "{{ hlinux_apt_repo_dir }}/dists/{{ hlinux_distro }}/main/installer-amd64/current/images/netboot.iso"
@@ -167,14 +167,14 @@
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Remove bad netboot area
-  sudo: yes
+  become: true
   file:
     path: "{{ hlinux_apt_repo_dir }}/dists/{{ hlinux_distro }}/main/installer-amd64/current/images/netboot"
     state: absent
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Create good netboot area
-  sudo: yes
+  become: true
   file:
     path: "{{ hlinux_apt_repo_dir }}/dists/{{ hlinux_distro }}/main/installer-amd64/current/images/netboot"
     state: directory
@@ -186,7 +186,7 @@
   with_fileglob: "{{ grub_net_glob }}"
 
 - name: deployer-setup | init-deployer-from-iso | create netboot destination
-  sudo: yes
+  become: true
   file: path=/var/lib/cobbler/loaders state=directory mode=0755
   when: hlinux_repo_available
 
@@ -196,14 +196,14 @@
   with_fileglob: "{{ netboot_tarball_glob }}"
 
 - name: deployer-setup | init-deployer-from-iso | Populate good netboot area
-  sudo: yes
+  become: true
   unarchive:
     src: "{{ hlinux_netboot_tarball }}"
     dest: "{{ hlinux_apt_repo_dir }}/dists/{{ hlinux_distro }}/main/installer-amd64/current/images/netboot"
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Add deployer repo to sources.list
-  sudo: yes
+  become: true
   apt_repository: repo={{ hlinux_repo_source }} state=present
   when: hlinux_repo_available
 
@@ -218,7 +218,7 @@
   register: cdrom_sources
 
 - name: deployer-setup | init-deployer-from-iso | Remove cdrom install sources
-  sudo: yes
+  become: true
   apt_repository:
     repo: "{{ item }}"
     state: absent
@@ -226,12 +226,12 @@
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Add i386 architecture to the deployer dpkg
-  sudo: yes
+  become: true
   command: dpkg --add-architecture i386
   when: hlinux_repo_available
 
 - name: deployer-setup | init-deployer-from-iso | Run apt-get update to reload sources
-  sudo: yes
+  become: true
   shell: |
     apt-get update
   when: hlinux_repo_available

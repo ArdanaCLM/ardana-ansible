@@ -21,14 +21,14 @@
   apt:
     name: git
     state: present
-  sudo: yes
+  become: true
   when: ansible_os_family | lower != 'suse'
 
 - name: git-operations | initialise | Install required software
   zypper:
     name: git-core
     state: present
-  sudo: yes
+  become: true
   when: ansible_os_family | lower == 'suse'
 
 - name: git-operations | initialise | Create initial repository
