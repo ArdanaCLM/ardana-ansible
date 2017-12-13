@@ -27,8 +27,6 @@
   tasks:
   - action: setup
 
-- include: installui-reconfigure.yml
-  when: ansible_os_family == 'Debian'
-
+#- include: installui-reconfigure.yml
 - include: ardana-deploy.yml
 - include: ardana-status.yml
