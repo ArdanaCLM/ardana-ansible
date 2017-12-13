@@ -16,11 +16,12 @@
 #
 ---
 ardanauser_home: "{{ ansible_env['HOME'] }}"
+deployer_media_legacy_layout: "{{ ansible_env['ARDANA_DEPLOYER_MEDIA_LEGACY_LAYOUT']|default(true) }}"
 
 ansible_setup_ardana_filter_plugins: "{{ ardanauser_home }}/openstack/ardana/ansible/filter_plugins"
 ansible_setup_ardana_connection_plugins: "{{ ardanauser_home }}/openstack/ardana/ansible/connection_plugins"
 
-ansible_setup_bin_dir: "{{ 'ansible' | bin_dir }}"
+ansible_setup_bin_dir: "{{ 'ansible'|bin_dir if deployer_media_legacy_layout|bool == true else '/usr/bin/' }}"
 ansible_setup_site_packages: "{{ lookup( 'pipe', ansible_setup_bin_dir ~ '/python -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\"' ) }}"
 hosts_localhost: "{{ ardanauser_home }}/openstack/ardana/ansible/hosts/localhost"
 hosts_verb_hosts: "{{ ardanauser_home }}/scratch/ansible/next/ardana/ansible/hosts/verb_hosts"
