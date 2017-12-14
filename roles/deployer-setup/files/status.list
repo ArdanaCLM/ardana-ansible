@@ -51,7 +51,7 @@ eon-status
 heat-status
 horizon-status
 logging-status
-ceilometer-status
+#ceilometer-status
 ceph-status
 freezer-status
 ardana-extra-status

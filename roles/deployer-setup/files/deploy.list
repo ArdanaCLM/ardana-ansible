@@ -53,7 +53,7 @@ eon-deploy
 heat-deploy
 horizon-deploy
 logging-deploy
-ceilometer-deploy
+#ceilometer-deploy
 ceph-deploy
 freezer-deploy
 tempest-deploy
