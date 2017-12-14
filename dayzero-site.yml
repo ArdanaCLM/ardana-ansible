@@ -20,6 +20,14 @@
 #
 ##############################################################################
 ---
+- include: pbstart.yml
+  vars:
+    playbook_name: "dayzero-site.yml"
+
 - include: wipe_disks.yml
 - include: site.yml
+
+- include: pbfinish.yml
+  vars:
+    playbook_name: "dayzero-site.yml"
 

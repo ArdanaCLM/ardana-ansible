@@ -17,6 +17,10 @@
 ---
 # Regather facts on all hosts in case of configuration changes that haven't
 # been reflected in the fact cache
+- include: pbstart.yml
+  vars:
+    playbook_name: "site.yml"
+
 - include: ardana-refresh-facts.yml
 
 - include: guard-deployment.yml
@@ -30,3 +34,7 @@
 #- include: installui-reconfigure.yml
 - include: ardana-deploy.yml
 - include: ardana-status.yml
+
+- include: pbfinish.yml
+  vars:
+    playbook_name: "site.yml"
