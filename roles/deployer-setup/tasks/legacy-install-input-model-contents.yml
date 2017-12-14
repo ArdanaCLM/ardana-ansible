@@ -38,4 +38,4 @@
     dest: "{{ git_operations_staging_directory }}"
     delete: yes
     copy_links: yes
-  with_items: "{{ ardana_input_model_deployer.stdout_lines | difference(['', 'services']) }}"
+  with_items: "{{ ardana_input_model_deployer.stdout_lines | default([]) | difference(['', 'services']) }}"

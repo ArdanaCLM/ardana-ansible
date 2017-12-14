@@ -18,16 +18,19 @@
 
 - name: deployer-setup | install-input-model-contents | SUSE- Install ardana input model (rpm)
   become: yes
+  when: ansible_os_family == 'Suse'
   zypper:
     name: "{{ item }}"
-    state: latest
+    state: present
   with_items:
-    ardana-input-model
+    - ardana-input-model
 
-- name: deployer-setup | install-input-model-contents | Copy examples to ardana directory
+- name: deployer-setup | install-input-model-contents | Copy examples to ardana directory (rpm)
+  when: ansible_os_family == 'Suse'
   synchronize:
-    src: "{{ deployer_input_model_src }}/{{ item }}"
+    src: "{{ deployer_input_model_src }}/"
     dest: "{{ git_operations_staging_directory }}"
     delete: yes
     copy_links: yes
-  with_items: "{{ ardana_input_model_deployer.stdout_lines | difference(['', 'services']) }}"
+    rsync_opts:
+      - "--exclude=services"
