@@ -27,6 +27,7 @@
     OS_PASSWORD: "{{ openstack_password }}"
     OS_PROJECT_DOMAIN_NAME: "{{ openstack_project_domain_name }}"
     OS_PROJECT_NAME: "{{ openstack_project_name }}"
+    OS_CACERT: "{{ openstack_ca_file }}"
   register: image_id_list
   run_once: true
 
