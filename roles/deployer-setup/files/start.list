@@ -27,6 +27,7 @@ barbican-start
 ardana-service-start
 ops-console-start
 zookeeper-start
+cassandra-start
 monasca-start
 spark-start
 monasca-transform-start

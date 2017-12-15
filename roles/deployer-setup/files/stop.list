@@ -36,6 +36,7 @@ swift-stop
 monasca-transform-stop
 spark-stop
 monasca-stop
+cassandra-stop
 zookeeper-stop
 ardana-service-stop
 ops-console-stop
