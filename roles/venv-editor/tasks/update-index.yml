@@ -28,7 +28,7 @@
 
 
 - name: venv-editor | update-index | Ready the index
-  become: true
+  become: yes
   command: ./create_index --dir={{ item.0 | dirname }}
   args:
     chdir: "{{ 'packager' | bin_dir }}"

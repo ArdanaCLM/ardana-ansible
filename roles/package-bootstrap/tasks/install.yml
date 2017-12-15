@@ -28,7 +28,7 @@
     group: root
     mode: 0755
     state: directory
-  become: true
+  become: yes
   when: source is defined and source
 
 - name: package-bootstrap | install | Copy tarball to remote system
@@ -38,7 +38,7 @@
     owner: root
     group: root
     mode: 0644
-  become: true
+  become: yes
   when: source is defined and source
 
 - name: package-bootstrap | install | Ensure package installation directory is created
@@ -48,7 +48,7 @@
     group: root
     mode: 0755
     state: directory
-  become: true
+  become: yes
 
 - name: package-bootstrap | install | Explode tarball at destination
   unarchive:
@@ -57,7 +57,7 @@
     owner: root
     group: root
     copy: no
-  become: true
+  become: yes
 
 - name: package-bootstrap | install | Ensure service installation directory is created
   file:
@@ -66,7 +66,7 @@
     group: root
     mode: 0755
     state: directory
-  become: true
+  become: yes
 
 - name: package-bootstrap | install | Link service component venv
   file:
@@ -76,7 +76,7 @@
     group: root
     mode: 0755
     state: link
-  become: true
+  become: yes
 
 - name: package-bootstrap | install | Mark service component as active
   file:
@@ -86,5 +86,5 @@
     group: root
     mode: 0755
     state: link
-  become: true
+  become: yes
 

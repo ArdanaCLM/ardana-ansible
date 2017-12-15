@@ -17,7 +17,7 @@
 ---
 
 - name: deployer-setup | install-input-model-contents | SUSE- Install ardana input model (rpm)
-  become: true
+  become: yes
   zypper:
     name: "{{ item }}"
     state: latest

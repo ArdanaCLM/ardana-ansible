@@ -38,7 +38,7 @@
       when: failed_nodes is defined
 
     - name: install-os | ready | Remove failed nodes
-      become: true
+      become: yes
       command: cobbler system remove --name="{{item}}"
       ignore_errors: yes
       with_items: nodes
