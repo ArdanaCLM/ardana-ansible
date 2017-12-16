@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017 SUSE LLC 		
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,11 +16,73 @@
 # Playbook for setting up the installui on the deployer
 ---
 
-- name: installui | configure | Create installui.service.d directory
+- name: installui | install | Update venv cache
+  become: yes
+  install_package:
+    cache: update
+
+- name: installui | install | Install Cloud Installer server
+  become: yes
+  install_package:
+    name: installer-server
+    service: installer-server
+    state: present
+    activate: act_on
+  notify: installui_change
+
+- name: installui | install | Install Cloud Installer UI
+  become: yes
+  install_package:
+    name: installer-ui
+    service: installer-ui
+    state: present
+    activate: act_on
+  notify: installui_change
+
+# Don't use 'mode' parameter in unarchive module due to ansible bug!
+#   https://github.com/ansible/ansible-modules-core/issues/4813
+- name: installui | install | Extract Cloud Installer UI tarball
+  become: yes
+  unarchive:
+    dest: "{{ ui_comp | venv_dir }}"
+    src: "{{ item }}"
+    copy: no
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+  with_fileglob:
+    - "{{ ui_comp | jar_dir }}/cloudinstaller-*.tgz"
+
+- name: installui | configure | Create systemd directory
   become: yes
   file:
     path: "{{ systemd_config_dir }}"
     state: directory
+
+- name: installui | configure | Create log directory
+  become: yes
+  file:
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    path: "{{ log_dir }}"
+    state: directory
+
+- name: installui | configure | Apply systemd template
+  become: yes
+  template:
+    src: "local.conf.j2"
+    dest: "{{ systemd_config_file }}"
+  notify: installui_change
+
+- name: installui | install | Setup Install UI service
+  become: yes
+  setup_systemd:
+    service: "{{ server_comp }}"
+    user: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    cmd: python
+    args: >
+      "{{ server_comp | venv_dir }}/lib/python2.7/site-packages/ardana_installer_server/main.py"
+      --config-file {{ server_comp | config_dir }}/{{ server_comp }}.conf
 
 - name: installui | configure | Create ardana installer temp directory
   become: yes
@@ -31,91 +93,3 @@
     owner: "{{ ardanauser }}"
     group: "{{ ardanauser }}"
 
-- name: installui | configure | Apply systemd template
-  become: yes
-  template:
-    src: "local.conf.j2"
-    dest: "{{ systemd_config_file }}"
-  notify: installui_change
-
-- name: installui | install | Clear old directory
-  become: yes
-  file:
-    state: absent
-    path: "{{ installui_directory }}"
-    owner: "{{ ardanauser }}"
-    group: "{{ ardanauser }}"
-    mode: 0775
-    state: directory
-
-# unclear what this does or if its required
-- name: installui | install | Update venv cache
-  become: yes
-  install_package:
-    cache: update
-
-- name: installui | install | Install Cloud Installer UI
-  become: yes
-  install_package:
-    name: installui
-    service: installui
-    state: present
-    activate: act_on
-  notify: installui_change
-
-- name: installui | install | Extract Install UI service files
-  become: yes
-  unarchive:
-    dest: "{{ installui_directory }}"
-    src: "{{ item }}"
-    copy: no
-    owner: "{{ ardanauser }}"
-    group: "{{ ardanauser }}"
-    mode: 0644
-  with_fileglob:
-    - "{{ 'installui' | jar_dir }}/cloudinstaller-*.tgz"
-
-# Directories need to be executable for GUI to access files
-- name: installui | install | Set permission on directories to be executable
-  become: yes
-  command: find {{ installui_directory }} -type d -exec chmod 0755 {} +
-
-# the Systemd setup command assumes a /venv/bin location for commands
-- name: installui | install | Create fake venv bin directory
-  become: yes
-  file:
-    path: "{{ installui_directory }}/venv/bin"
-    owner: "{{ ardanauser }}"
-    group: "{{ ardanauser }}"
-    state: directory
-
-- name: installui | install | Setup Install UI service
-  become: yes
-  setup_systemd:
-    service: installui
-    user: "{{ ardanauser }}"
-    group: "{{ ardanauser }}"
-    install_dir: "{{ ardanauser_home }}"
-    cmd: python
-    args: >
-      "{{ installui_directory }}/lib/python2.7/site-packages/cloudinstaller/main.py"
-
-# Temporary HLINUX HACK! - copy the system python2.7 over the venv one
-- name: installui | install | hlinux HACK copy system python2.7
-  become: yes
-  copy: src=/usr/bin/python2.7 dest={{ installui_directory }}/bin/python2.7
-  when: ansible_os_family == 'Debian'
-
-# symlink the "fake" python interpreter that systemd is looking for to the real one
-- name: installui | install | Symlink Python2.7
-  become: yes
-  file:
-    dest: "{{ installui_directory }}/venv/bin/python"
-    src: "{{ installui_directory }}/bin/python"
-    force: yes
-    state: link
-
-# Python2.7 binary in the venv needs to be excutable
-- name: installui | install | Set permission on directories to be executable
-  become: yes
-  command: chmod +x {{ installui_directory }}/bin/python2.7

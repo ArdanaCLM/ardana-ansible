@@ -19,18 +19,18 @@
 - name: installui | start | Restart Install UI service, if needed
   become: yes
   service:
-    name: installui
+    name: "{{ server_comp }}"
     state: restarted
-  when: installui_restart_required
+  when: server_restart_required
 
 - name: installui | start | Ensure that Install UI service is started
   become: yes
   service:
-    name: installui
+    name: "{{ server_comp }}"
     state: started
 
 - name: installui | start | Wait for Install UI service to settle
   command: sleep 5
 
 - name: installui | start | Check again to see if the service is started
-  command: systemctl status installui
+  command: systemctl status {{ server_comp }}

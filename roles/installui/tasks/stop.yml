@@ -19,5 +19,5 @@
 - name: installui | stop | Stop Day Zero UI service
   become: yes
   service:
-    name: installui
+    name: "{{ server_comp }}"
     state: stopped

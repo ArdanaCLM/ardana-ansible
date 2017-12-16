@@ -20,12 +20,13 @@
   become: yes
   template:
     src: "config.json.j2"
-    dest: "{{ ui_config_file }}"
+    dest: "{{ ui_comp | venv_dir }}/config.json"
+    #dest: "{{ ui_comp | config_dir }}/config.json"  # TODO!
   notify: installui_change
 
-- name: installui | post-configure | Apply shim config
+- name: installui | post-configure | Apply server config
   become: yes
   template:
-    src: "defaults.cfg.j2"
-    dest: "{{ shim_config_file }}"
+    src: "{{ server_comp }}.conf.j2"
+    dest: "{{ server_comp | config_dir }}/{{ server_comp }}.conf"
   notify: installui_change

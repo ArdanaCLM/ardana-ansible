@@ -17,5 +17,5 @@
 
 - name: installui_change
   set_fact:
-    installui_restart_required: true
+    server_restart_required: true
 
