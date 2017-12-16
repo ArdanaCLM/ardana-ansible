@@ -14,20 +14,17 @@
 # under the License.
 #
 ardanauser: "{{ ansible_env['USER'] }}"
-ardanauser_home: "{{ ansible_env['HOME'] }}"
-installui_directory: "{{ ansible_env['HOME'] }}/installui"
-installui_restart_required: false
+ui_comp: installer-ui
+server_comp: installer-server
+server_restart_required: false
 
+log_dir: "/var/log/ardana_installer"
 tmp_dir: "/var/cache/ardana_installer"
-ui_config_file: "{{ installui_directory }}/lib/python2.7/site-packages/cloudinstaller/web/config.json"
-shim_config_file: "{{ installui_directory }}/lib/python2.7/site-packages/cloudinstaller/config/defaults.cfg"
-systemd_config_dir: "/usr/lib/systemd/system/installui.service.d"
+systemd_config_dir: "/usr/lib/systemd/system/{{ server_comp }}.service.d"
 systemd_config_file: "{{ systemd_config_dir }}/local.conf"
 db_file: "{{ tmp_dir }}/db.json"
 progress_file: "{{ tmp_dir }}/progress.json"
 
 # TODO Change these to https when ready
-ardana_service_url: "http://localhost:9085"
-shim_host: "0.0.0.0"
-shim_port: "3000"
-shim_url: "http://localhost:{{ shim_port }}"
+server_port: 3000
+server_url: "http://localhost:{{ server_port }}"
