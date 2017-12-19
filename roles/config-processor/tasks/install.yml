@@ -56,7 +56,7 @@
 - name: config-processor | install | Copy Configuration Processor Services into work dir
   when: deployer_media_legacy_layout|bool
   synchronize:
-    src: "{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0/services"
+    src: "{{ config_processor_input_model_services_src }}"
     dest: "{{ config_processor_install_ardana }}"
     recursive: yes
   delegate_to: deployer
