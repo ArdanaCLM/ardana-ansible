@@ -22,6 +22,10 @@
     - installui
   tasks:
     - include: roles/installui/tasks/install.yml
+      when: deployer_media_legacy_layout|bool
     - include: roles/installui/tasks/configure.yml
+      when: deployer_media_legacy_layout|bool
     - include: roles/installui/tasks/stop.yml
+      when: deployer_media_legacy_layout|bool
     - include: roles/installui/tasks/start.yml
+      when: deployer_media_legacy_layout|bool
