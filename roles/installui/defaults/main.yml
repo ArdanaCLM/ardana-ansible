@@ -25,6 +25,5 @@ systemd_config_file: "{{ systemd_config_dir }}/local.conf"
 db_file: "{{ tmp_dir }}/db.json"
 progress_file: "{{ tmp_dir }}/progress.json"
 
-# TODO Change these to https when ready
+# TODO add server_url back when https enabled, requires UI update
 server_port: 3000
-server_url: "http://localhost:{{ server_port }}"
