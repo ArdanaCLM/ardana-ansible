@@ -17,7 +17,7 @@
 #
 #}
 # This is reverse order to ardana-deploy.yml and ardana-start.yml
-freezer-stop
+#freezer-stop
 ceph-stop
 ceilometer-stop
 logging-stop

@@ -53,7 +53,7 @@ horizon-upgrade
 logging-upgrade
 ceilometer-upgrade
 ceph-upgrade
-freezer-upgrade
+#freezer-upgrade
 tempest-upgrade
 sherpa-remove
 # Update haproxy last as it conflicts with a setting in the beta2 kit
