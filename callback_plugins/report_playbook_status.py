@@ -16,19 +16,6 @@ class CallbackModule(object):
         self.timeout = 5  # 5 seconds
         # ardana-service runs on the deployer:9085 by default
 
-    def updateSrvcUrl(self):
-        hosts = self.playbook.inventory.get_hosts()
-        if(hosts):
-            try:
-                host_vars = \
-                    self.playbook.inventory.get_variables(hosts[0].name)
-                self.srvcurl = \
-                    host_vars['ARD_SVC']['advertises'][
-                        'vips']['private'][0]['url']
-            except (KeyError, TypeError) as error:
-                # leave the existing URL in place if the key isnt found
-                pass
-
     def playbook_on_task_start(self, name, is_conditional):
         """Triggers callbacks other services if a specific play was run
           Since playbooks are being run in a nested fashion, only
@@ -39,8 +26,8 @@ class CallbackModule(object):
           important playbooks, and parse for that task here
         """
         callbacks_map = {
-            'pbfinish.yml pb_finish_play': 'stop',
-            'pbstart.yml pb_start_play': 'start'
+            'pbfinish.yml pb_finish_playbook': 'stop',
+            'pbstart.yml pb_start_playbook': 'start'
         }
         playbook_name = self.task.play_vars.get('playbook_name', None)
         if playbook_name is not None and name in callbacks_map:
@@ -60,7 +47,6 @@ class CallbackModule(object):
         self.post_to_listener(self.playbook.filename, action)
 
     def post_to_listener(self, playbook, action):
-        self.updateSrvcUrl()
         urlpath = '/api/v2/listener/playbook'
         url = self.srvcurl + urlpath
         try:
