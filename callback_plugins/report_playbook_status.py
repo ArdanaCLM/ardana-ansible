@@ -2,7 +2,7 @@
 
 import os
 import urllib2
-
+import json
 
 class CallbackModule(object):
 
@@ -12,9 +12,9 @@ class CallbackModule(object):
 
     """
     def __init__(self):
-        self.srvcurl = 'http://localhost:3000'
+        self.srvcurl = 'http://localhost:9085'
         self.timeout = 5  # 5 seconds
-        # ardana-service runs on the deployer:3000 by default
+        # ardana-service runs on the deployer:9085 by default
 
     def updateSrvcUrl(self):
         hosts = self.playbook.inventory.get_hosts()
