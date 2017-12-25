@@ -109,6 +109,7 @@
     - osconfig
   tasks:
     - include: roles/osconfig/tasks/install-ansible-prereqs.yml
+      when: ansible_os_family == 'Debian'
 
 # Install config processor
 - hosts: localhost
