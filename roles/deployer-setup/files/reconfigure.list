@@ -53,7 +53,7 @@ ceilometer-reconfigure
 ceilometer-pipeline-reconfigure
 ceph-reconfigure
 vsa-reconfigure
-#freezer-reconfigure
+freezer-reconfigure
 tempest-reconfigure
 
 # Post Reconfiguration tasks

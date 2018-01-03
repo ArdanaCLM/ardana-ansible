@@ -55,6 +55,6 @@ horizon-deploy
 logging-deploy
 #ceilometer-deploy
 ceph-deploy
-#freezer-deploy
+freezer-deploy
 tempest-deploy
 ardana-extra-deploy

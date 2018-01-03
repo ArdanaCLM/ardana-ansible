@@ -50,5 +50,5 @@ horizon-start
 logging-start
 ceilometer-start
 ceph-start
-#freezer-start
+freezer-start
 ardana-extra-start

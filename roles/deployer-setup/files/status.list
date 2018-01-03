@@ -53,5 +53,5 @@ horizon-status
 logging-status
 #ceilometer-status
 ceph-status
-#freezer-status
+freezer-status
 ardana-extra-status
