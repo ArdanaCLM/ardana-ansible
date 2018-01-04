@@ -34,7 +34,6 @@ monasca-reconfigure
 ops-console-reconfigure
 spark-reconfigure
 monasca-transform-reconfigure
-eon-reconfigure
 swift-reconfigure
 glance-reconfigure
 neutron-reconfigure
@@ -51,8 +50,6 @@ horizon-reconfigure
 kronos-reconfigure
 ceilometer-reconfigure
 ceilometer-pipeline-reconfigure
-ceph-reconfigure
-vsa-reconfigure
 freezer-reconfigure
 tempest-reconfigure
 

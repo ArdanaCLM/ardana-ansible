@@ -42,12 +42,6 @@
     install_hosts: DES-CLI
     install_package: "{{ DES_CLI.vars.designate_client }}"
 
-# eon-client
-- include: client-deploy.yml
-  vars:
-    install_hosts: EON-CLI
-    install_package: "{{ EON_CLI.vars.eon_client }}"
-
 # glance-client
 - include: client-deploy.yml
   vars:

@@ -40,8 +40,6 @@ swift-deploy
 glance-deploy
 neutron-deploy
 ironic-deploy
-vsa-deploy
-cmc-deploy
 nova-deploy
 magnum-deploy
 cinder-deploy
@@ -49,12 +47,10 @@ octavia-deploy
 designate-deploy
 powerdns-deploy
 bind-deploy
-eon-deploy
 heat-deploy
 horizon-deploy
 logging-deploy
 #ceilometer-deploy
-ceph-deploy
 freezer-deploy
 tempest-deploy
 ardana-extra-deploy

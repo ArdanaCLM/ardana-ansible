@@ -40,12 +40,10 @@
 #- include: designate-pre-upgrade.yml
 #- include: powerdns-pre-upgrade.yml
 #- include: bind-pre-upgrade.yml
-#- include: eon-pre-upgrade.yml
 #- include: ironic-pre-upgrade.yml
 #- include: heat-pre-upgrade.yml
 #- include: horizon-pre-upgrade.yml
 - include: kronos-pre-upgrade.yml
 #- include: ceilometer-pre-upgrade.yml
-- include: ceph-pre-upgrade.yml
 #- include: freezer-pre-upgrade.yml
 #- include: tempest-pre-upgrade.yml
