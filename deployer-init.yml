@@ -95,7 +95,6 @@
       when: deployer_media_legacy_layout|bool
     - include: roles/package-repo/tasks/configure.yml
     - include: roles/package-consumer/tasks/install.yml
-      when: deployer_media_legacy_layout|bool
     - include: roles/package-consumer/tasks/configure.yml
       vars:
        host:

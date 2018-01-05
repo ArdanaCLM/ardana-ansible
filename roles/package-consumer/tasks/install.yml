@@ -15,7 +15,15 @@
 # under the License.
 #
 ---
+- name: package-consumer | install | Install ardana-packager
+  become: yes
+  zypper:
+    pkg:
+      - python-ardana-packager
+  when: deployer_media_legacy_layout|bool == false
+
 - include: ../../package-bootstrap/tasks/install.yml
   vars:
     source: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ package_venv_path }}/packager-{{ ardana_version }}.tgz"
     tarball: "{{ PACKAGE_CONSUMER.CACHE_DIR }}/packager-{{ ardana_version }}.tgz"
+  when: deployer_media_legacy_layout|bool
