@@ -51,7 +51,7 @@ bind-deploy
 heat-deploy
 horizon-deploy
 logging-deploy
-#ceilometer-deploy
+ceilometer-deploy
 freezer-deploy
 tempest-deploy
 ardana-extra-deploy

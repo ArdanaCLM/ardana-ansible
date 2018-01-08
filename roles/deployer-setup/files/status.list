@@ -47,6 +47,6 @@ bind-status
 heat-status
 horizon-status
 logging-status
-#ceilometer-status
+ceilometer-status
 freezer-status
 ardana-extra-status
