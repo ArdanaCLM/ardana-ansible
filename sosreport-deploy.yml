@@ -23,6 +23,7 @@
     - sosreport
   tasks:
     - include: roles/sosreport/tasks/install.yml
+      when: deployer_media_legacy_layout | bool
 
 - hosts: FND-RMQ
   max_fail_percentage: 0
@@ -31,6 +32,7 @@
     - rabbitmq # Bring in the RabbitMQ environment
   tasks:
     - include: roles/sosreport/tasks/install_rabbitmq.yml
+      when: deployer_media_legacy_layout | bool
 
 - hosts: OPS-LM
   max_fail_percentage: 0
@@ -39,3 +41,4 @@
     - git-operations # Bring in the git variables
   tasks:
     - include: roles/sosreport/tasks/install_git_repo.yml
+      when: deployer_media_legacy_layout | bool
