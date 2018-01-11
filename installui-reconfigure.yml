@@ -21,3 +21,4 @@
     - installui
   tasks:
     - include: roles/installui/tasks/configure.yml
+      when: deployer_media_legacy_layout|bool
