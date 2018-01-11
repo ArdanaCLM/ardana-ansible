@@ -74,7 +74,7 @@
     - deployer-setup
   tasks:
     - include: roles/deployer-setup/tasks/install-my-cloud-directory.yml
-    - include: roles/deployer-setup/tasks/legacy-install-input-model-contents.yml
+    - include: roles/deployer-setup/tasks/install-input-model-contents-legacy.yml
       when: deployer_media_legacy_layout|bool
     - include: roles/deployer-setup/tasks/install-input-model-contents.yml
       when: deployer_media_legacy_layout|bool == false
