@@ -29,6 +29,7 @@ barbican-status
 ardana-service-status
 ops-console-status
 zookeeper-status
+cassandra-status
 monasca-status
 spark-status
 monasca-transform-status

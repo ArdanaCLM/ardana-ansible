@@ -30,6 +30,7 @@ memcached-deploy
 keystone-deploy
 barbican-deploy
 zookeeper-deploy
+cassandra-deploy
 monasca-deploy
 ardana-service-deploy
 # ops console depends on kafka, installed by monasca
