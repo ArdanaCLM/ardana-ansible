@@ -16,7 +16,8 @@
 ---
 # Reconfigures installer UI config files during cloud installation (site.yml)
 
-- hosts: ARD-SVC
+- hosts: localhost
+  connection: local
   roles:
     - installui
   tasks:
