@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -32,7 +32,7 @@
       when: ansible_os_family == 'Suse'
     - include: roles/osconfig/tasks/setup-zypp.yml
       vars:
-          hlinux_server: "dir:{{ PACKAGE_CONSTANTS.REPO_DIR }}"
+          zypp_server: "dir:{{ PACKAGE_CONSTANTS.REPO_DIR }}"
       when: ansible_os_family == 'Suse'
 
 # Install and configure apache2 for venv and install ardana-input-model
