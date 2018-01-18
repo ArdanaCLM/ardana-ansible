@@ -52,7 +52,8 @@ def search_node(node, parent_not=False):
         for value in search_node(node.node, parent_not=True):
             yield value
     elif isinstance(node, nodes.Test):
-        if (node.name == "defined" and node.node.name.startswith(ARDANA_PREFIX)
+        if (hasattr(node, 'name') and node.name == "defined"
+           and hasattr(node.node, 'name') and node.node.name.startswith(ARDANA_PREFIX)
            and node.node.ctx == "load" and not parent_not):
             yield node.node.name
 
