@@ -1,0 +1,141 @@
+#
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Check content of directory to be the right ISO, fail if unexpected content
+# found.
+#
+# Vars:
+# check_iso_header - header to display when printing debug/error messages
+# check_iso_file - ISO file to mount before checking, can be empty string
+# check_iso_mount_dir - dir to check for mounted content, can be empty string
+# check_iso_target_dir - target dir
+# check_iso_marker_file - file which indicates the entire ISO
+# check_iso_marker_file_line - regexp to check in first 2 lines of the file
+---
+- name: deployer-setup | check-iso | Check if ISO file exists
+  stat:
+    path: "{{ check_iso_file }}"
+  register: check_iso_file_exists_result
+  when: check_iso_file|length > 0
+
+- name: deployer-setup | check-iso | Print debug info
+  debug:
+    msg: "Checking if ISO file {{ check_iso_file }} exists:
+      {{ check_iso_file_exists_result.stat.exists }}"
+  when: check_iso_file|length > 0
+
+- name: deployer-setup | check-iso | Set fact for ISO file availability
+  set_fact:
+    check_iso_file_available: "{{ check_iso_file|length > 0 and
+      check_iso_file_exists_result.stat.exists }}"
+
+- name: deployer-setup | check-iso | Print debug info
+  debug:
+    msg: "Mounting {{ check_iso_file }} in {{ check_iso_target_dir }}"
+  when: check_iso_file_available|bool
+
+- name: deployer-setup | check-iso | Mount proposed ISO file
+  become: yes
+  mount:
+    name: "{{ check_iso_target_dir }}"
+    src: "{{ check_iso_file }}"
+    fstype: iso9660
+    opts: ro
+    state: mounted
+  when: check_iso_file_available|bool
+
+# No ternary filter in Jinja 1.7
+- name: deployer-setup | check-iso | Identify which directory to check
+    if check_iso_mount_dir is provided
+  set_fact:
+    check_iso_dir: "{{ check_iso_mount_dir }}"
+  when: check_iso_mount_dir|length > 0
+
+- name: deployer-setup | check-iso | Identify which directory to check
+    if check_iso_mount_dir is not provided
+  set_fact:
+    check_iso_dir: "{{ check_iso_target_dir }}"
+  when: check_iso_mount_dir|length == 0
+
+- name: deployer-setup | check-iso | Print debug info
+  debug:
+    msg: "Checking if '{{ check_iso_header }}' content is available in
+      {{ check_iso_dir }}"
+
+- name: deployer-setup | check-iso | Check if marker file exists
+  stat:
+    path: "{{ check_iso_dir }}/{{ check_iso_marker_file }}"
+  register: check_iso_target_exists_result
+
+- name: deployer-setup | check-iso | Check marker file contents
+  shell: "head -2 {{ check_iso_dir }}/{{ check_iso_marker_file }}"
+  register: check_iso_target_contents_result
+  when: check_iso_target_exists_result.stat.exists
+
+- name: deployer-setup | check-iso | Set internal result flag
+  set_fact:
+    _check_iso_ok: "{{ check_iso_target_exists_result.stat.exists and
+      check_iso_target_contents_result.stdout
+      |search(check_iso_marker_file_line) }}"
+
+- name: deployer-setup | check-iso | Print debug info
+  debug:
+    msg: "Check if {{ check_iso_dir }} contains '{{ check_iso_header }}':
+      {{ _check_iso_ok }}"
+
+- name: deployer-setup | check-iso | Ensure parent of target dir exists
+  become: yes
+  file:
+    path: "{{ check_iso_target_dir|dirname }}"
+    state: directory
+    recurse: yes
+  when: _check_iso_ok|bool and check_iso_mount_dir|length > 0
+
+- name: deployer-setup | check-iso | Symlink target dir to proposed mount dir
+  become: yes
+  file:
+    dest: "{{ check_iso_target_dir }}"
+    src: "{{ check_iso_mount_dir }}"
+    state: link
+  when: _check_iso_ok|bool and check_iso_mount_dir|length > 0
+
+- name: deployer-setup | check-iso | Unmount proposed ISO file in case of
+    wrong content
+  become: yes
+  mount:
+    name: "{{ find_iso_target_dir }}"
+    src: "{{ find_iso_file }}"
+    fstype: iso9660
+    opts: ro
+    state: unmounted
+  when: check_iso_file_available|bool and not _check_iso_ok|bool
+
+- name: deployer-setup | check-iso | Fail if wrong ISO/DVD mounted
+  fail:
+    msg: "Unrecognized content found in {{ check_iso_target_dir }} folder,
+      where content of '{{ check_iso_header }}' DVD/ISO is expected."
+  when: check_iso_target_exists_result.stat.exists and
+    not check_iso_file_available|bool and not _check_iso_ok|bool
+
+- name: deployer-setup | check-iso | Fail if wrong ISO/DVD file provided
+  fail:
+    msg: "Unrecognized content found in {{ check_iso_file }} ISO file, where
+      content of '{{ check_iso_header }}' DVD/ISO is expected."
+  when: check_iso_target_exists_result.stat.exists and
+    check_iso_file_available|bool and not _check_iso_ok|bool
+
+- name: deployer-setup | check-iso | Set resulting var for external use
+  set_fact:
+    check_iso_ok: "{{ _check_iso_ok }}"

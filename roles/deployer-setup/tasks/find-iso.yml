@@ -1,0 +1,84 @@
+#
+# (c) Copyright 2017 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Try to find mounted ISO by content of a specific file, or unmounted ISO file.
+# If found, create a symlink from specified directory to mounted CD-ROM, or
+# mount ISO file on temporary folder and rsync.
+# Vars:
+# find_iso_header - name of the ISO to search (for debugging purposes)
+# find_iso_file - iso file to mount if mounted content not found
+# find_iso_mount_dir - possible mount location (/media/cdrom, etc)
+# find_iso_marker_file - file to look for on mounted ISO
+# find_iso_marker_file_line - regexp line to search in marker file
+# find_iso_target_dir - dir to link or rsync
+#
+# Sample marker files and content:
+#
+# Hlinux
+#$ cat /media/cdrom/.disk/info
+#hLinux "cattleprod" - Official amd64 blaster NETINST 20170928-4.0.4_ga-1%
+#
+# SLES
+#> cat /media/cdrom/media.1/products
+#/ SLES12-SP3 12.3-0
+#
+# SLES-SDK
+#> cat /media/sdk/media.1/products
+#/ SDK12-SP3 12.3-0
+#
+# RHEL
+# $ cat /media/rhel/.discinfo
+# 1476915898.899142
+# Red Hat Enterprise Linux 7.3
+# x86_64
+# 1
+---
+- name: deployer-setup | find-iso | Check if existing setup is ok
+  include: check-iso.yml
+  vars:
+    check_iso_header: "{{ find_iso_header }}"
+    check_iso_file: ''
+    check_iso_mount_dir: ''
+    check_iso_target_dir: "{{ find_iso_target_dir }}"
+    check_iso_marker_file: "{{ find_iso_marker_file }}"
+    check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+
+- name: deployer-setup | find-iso | Try proposed mounted directory
+  include: check-iso.yml
+  vars:
+    check_iso_header: "{{ find_iso_header }}"
+    check_iso_file: ''
+    check_iso_mount_dir: "{{ find_iso_mount_dir }}"
+    check_iso_target_dir: "{{ find_iso_target_dir }}"
+    check_iso_marker_file: "{{ find_iso_marker_file }}"
+    check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+  when: not check_iso_ok|bool
+
+- name: deployer-setup | find-iso | Try proposed ISO file
+  include: check-iso.yml
+  vars:
+    check_iso_header: "{{ find_iso_header }}"
+    check_iso_file: "{{ find_iso_file }}"
+    check_iso_mount_dir: ''
+    check_iso_target_dir: "{{ find_iso_target_dir }}"
+    check_iso_marker_file: "{{ find_iso_marker_file }}"
+    check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+  when: not check_iso_ok|bool
+
+- name: deployer-setup | find-iso | Warn if no ISO content found anywhere
+  debug:
+    msg: "WARNING: content of '{{ find_iso_header }}' DVD/ISO is not found
+      mounted at {{ find_iso_mount_dir }} or in ISO file {{ find_iso_file }}"
+  when: not check_iso_ok|bool
