@@ -39,26 +39,6 @@
 
 - include: "find-iso.yml"
   vars:
-    find_iso_header: "SLES 12 SP3 SDK"
-    find_iso_file: "{{ ardanauser_home }}/{{ deployer_sles12sdk_iso }}"
-    find_iso_mount_dir: "/media/sdk"
-    find_iso_marker_file: "media.1/products"
-    find_iso_marker_file_line: " SDK12-SP3 "
-    find_iso_target_dir:
-      "{{ PACKAGE_CONSTANTS.REPO_DIR }}/ardana/sles12/zypper/SDK"
-
-- include: "find-iso.yml"
-  vars:
-    find_iso_header: "SLES 12 SP3 SDK"
-    find_iso_file: "{{ ardanauser_home }}/{{ deployer_sles12sdk_iso }}"
-    find_iso_mount_dir: "/media/sles_sdk"
-    find_iso_marker_file: "media.1/products"
-    find_iso_marker_file_line: " SDK12-SP3 "
-    find_iso_target_dir:
-      "{{ PACKAGE_CONSTANTS.REPO_DIR }}/ardana/sles12/zypper/SDK"
-
-- include: "find-iso.yml"
-  vars:
     find_iso_header: "Red Hat Enterprise Linux"
     find_iso_file: "{{ ardanauser_home }}/{{ deployer_rhel7_iso }}"
     find_iso_mount_dir: "/media/rhel"
