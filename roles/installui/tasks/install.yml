@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC 		
+# (c) Copyright 2017 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -28,6 +28,7 @@
     service: installer-server
     state: present
     activate: act_on
+  when: deployer_media_legacy_layout|bool
   notify: installui_change
 
 - name: installui | install | Install Cloud Installer UI
@@ -37,6 +38,7 @@
     service: installer-ui
     state: present
     activate: act_on
+  when: deployer_media_legacy_layout|bool
   notify: installui_change
 
 # Don't use 'mode' parameter in unarchive module due to ansible bug!
