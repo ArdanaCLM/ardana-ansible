@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -62,7 +62,9 @@
   include: _venv-import.yml
   vars:
     distro: debian
-  when: "'debian' in distro_list and search_result.stdout != ''"
+  when: ((ansible_os_family | lower == 'debian') or
+        (third_party_debian_enabled | default(false) | bool)) and
+         "'debian' in distro_list and search_result.stdout != ''"
 
 - name: thirdparty-venv | create-thirdparty-venvs |
         Import content for RHEL
@@ -76,8 +78,9 @@
         Import content for SLES
   include: _venv-import.yml
   vars:
-    distro: sles
-  when: (third_party_sles_enabled | default(false) | bool) and
+    distro: suse
+  when: ((ansible_os_family | lower == 'suse') or
+        (third_party_sles_enabled | default(false) | bool)) and
         "'suse' in distro_list and search_result.stdout != ''"
 
 - name: thirdparty-venv | create-thirdparty-venvs |

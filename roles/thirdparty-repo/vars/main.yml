@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2016-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -15,9 +15,13 @@
 # under the License.
 #
 ---
-# Thirdparty apt repo variables
+# Thirdparty os agnostic repo variables
 thirdparty_repo_loc: "ardana/{{ repo_name }}"
 thirdparty_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ thirdparty_repo_loc }}"
+
+# Thirdparty APT repo variables
+apt_thirdparty_loc: "ardana/hlinux/apt/{{ repo_name }}"
+apt_thirdparty_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ apt_thirdparty_loc }}"
 
 # Thirdparty YUM repo variables
 yum_thirdparty_loc: "ardana/rhel7/yum/{{ repo_name }}"

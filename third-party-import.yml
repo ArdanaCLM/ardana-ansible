@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,10 +19,12 @@
 
 - include: distro-list.yml
 - include: _third-party-import-debian-pkgs.yml
+  when: ansible_os_family | lower = 'debian' or
+        (third_party_debian_enabled | default(false) | bool)
 - include: _third-party-import-rhel-pkgs.yml
   when: third_party_rhel_enabled | default(false) | bool
 - include: _third-party-import-sles-pkgs.yml
-  when: third_party_sles_enabled | default(false) | bool
+  when: ansible_os_family | lower = 'suse'
 - include: _third-party-import-services.yml
 - include: _third-party-import-ansible.yml
 - include: _third-party-import-other.yml
