@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -21,7 +21,7 @@
   install_package:
     cache: update
 
-- name: installui | install | Install Cloud Installer server
+- name: installui | install | Install Cloud Installer server (venv)
   become: yes
   install_package:
     name: installer-server
@@ -31,7 +31,7 @@
   when: deployer_media_legacy_layout|bool
   notify: installui_change
 
-- name: installui | install | Install Cloud Installer UI
+- name: installui | install | Install Cloud Installer UI (venv)
   become: yes
   install_package:
     name: installer-ui
@@ -43,7 +43,7 @@
 
 # Don't use 'mode' parameter in unarchive module due to ansible bug!
 #   https://github.com/ansible/ansible-modules-core/issues/4813
-- name: installui | install | Extract Cloud Installer UI tarball
+- name: installui | install | Extract Cloud Installer UI tarball (venv)
   become: yes
   unarchive:
     dest: "{{ ui_comp | venv_dir }}"
@@ -75,16 +75,31 @@
     dest: "{{ systemd_config_file }}"
   notify: installui_change
 
-- name: installui | install | Setup Install UI service
+- name: installui | install | Setup Install UI service (venv)
   become: yes
   setup_systemd:
+    name: "{{ server_comp }}"
     service: "{{ server_comp }}"
     user: "{{ ardanauser }}"
     group: "{{ ardanauser }}"
     cmd: python
     args: >
       "{{ server_comp | venv_dir }}/lib/python2.7/site-packages/ardana_installer_server/main.py"
-      --config-file {{ server_comp | config_dir }}/{{ server_comp }}.conf
+      --config-file {{ server_cfg_dir }}/{{ server_comp }}.conf
+  when: deployer_media_legacy_layout|bool
+
+- name: installui | install | Setup Install UI service (rpm)
+  become: yes
+  setup_systemd:
+    name: "{{ server_comp }}"
+    service: "{{ server_comp }}"
+    user: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    install_path: /usr/bin
+    cmd: ardana-installer-server
+    args: >
+      --config-file {{ server_cfg_dir }}/{{ server_comp }}.conf
+  when: not deployer_media_legacy_layout|bool
 
 - name: installui | configure | Create ardana installer temp directory
   become: yes

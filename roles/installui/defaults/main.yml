@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,12 +14,27 @@
 # under the License.
 #
 ardanauser: "{{ ansible_env['USER'] }}"
+
 ui_comp: installer-ui
+ui_comp_dir: "{% if deployer_media_legacy_layout|bool -%}
+                  {{ ui_comp | venv_dir }}
+              {%- else -%}
+                  /usr/share/ardana/ardana-installer-ui/web
+              {%- endif -%}"
+ui_comp_cfg: "{{ ui_comp_dir }}/config.json"
+
 server_comp: installer-server
+server_cfg_dir: "{% if deployer_media_legacy_layout|bool -%}
+                     {{ server_comp | config_dir }}
+                 {%- else -%}
+                     /etc/ardana/ardana-installer-server
+                 {%- endif -%}"
+server_comp_cfg: "{{ server_cfg_dir }}/{{ server_comp }}.conf"
 server_restart_required: false
 
 log_dir: "/var/log/ardana_installer"
 tmp_dir: "/var/cache/ardana_installer"
+
 systemd_config_dir: "/usr/lib/systemd/system/{{ server_comp }}.service.d"
 systemd_config_file: "{{ systemd_config_dir }}/local.conf"
 db_file: "{{ tmp_dir }}/db.json"
