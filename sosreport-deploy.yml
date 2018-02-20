@@ -25,6 +25,13 @@
     - include: roles/sosreport/tasks/install.yml
       when: deployer_media_legacy_layout | bool
 
+- hosts: "all"
+  roles:
+    - supportutils
+  tasks:
+    - include: roles/supportutils/tasks/install.yml
+      when: deployer_media_legacy_layout | bool == False
+
 - hosts: FND-RMQ
   max_fail_percentage: 0
   roles:
