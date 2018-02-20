@@ -15,8 +15,7 @@
 #
 # Install and configure supportutils on all the nodes
 ---
-
-- hosts: "all"
+- hosts: "all:!localhost:!*-local"
   roles:
     - supportutils
   tasks:

@@ -25,7 +25,7 @@
     - include: roles/sosreport/tasks/install.yml
       when: deployer_media_legacy_layout | bool
 
-- hosts: "all"
+- hosts: "all:!localhost:!*-local"
   roles:
     - supportutils
   tasks:
