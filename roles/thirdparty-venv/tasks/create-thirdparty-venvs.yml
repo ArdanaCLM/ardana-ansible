@@ -58,7 +58,7 @@
   when: search_result.stdout == ''
 
 - name: thirdparty-venv | create-thirdparty-venvs |
-        Import content for hLinux
+        Import content for Debian
   include: _venv-import.yml
   vars:
     distro: debian

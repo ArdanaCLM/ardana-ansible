@@ -32,7 +32,7 @@
         FND_AP2_sites_enabled:
           deployer_venv_server.conf:
             listen: "*"
-            port: "{{ hlinux_server_port }}"
+            port: "{{ deployer_server_port }}"
             document_root: "{{ PACKAGE_CONSTANTS.REPO_DIR }}"
             additional_dirs:
               SUSE-12-3: /srv/www/suse-12.3

@@ -26,10 +26,6 @@
 #
 # Sample marker files and content:
 #
-# Hlinux
-#$ cat /media/cdrom/.disk/info
-#hLinux "cattleprod" - Official amd64 blaster NETINST 20170928-4.0.4_ga-1%
-#
 # SLES
 #> cat /media/cdrom/media.1/products
 #/ SLES12-SP3 12.3-0
