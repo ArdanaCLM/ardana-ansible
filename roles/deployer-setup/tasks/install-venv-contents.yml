@@ -28,7 +28,7 @@
 - name: deployer-setup | install-venv-contents | Ensure venv os dir exits exists
   become: yes
   file:
-    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch[item.item.key][ansible_architecture] }}"
+    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations[item.item.key][ansible_architecture] }}"
     state: directory
   when: item.stat.exists
   with_items: _venv_tar_result.results
@@ -37,7 +37,7 @@
   become: yes
   unarchive:
     src: "{{ ardanauser_home }}/{{ item.item.value }}"
-    dest: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch[item.item.key][ansible_architecture] }}"
+    dest: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations[item.item.key][ansible_architecture] }}"
     owner: root
     group: root
     copy: no

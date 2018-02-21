@@ -39,6 +39,6 @@
     - include: roles/venv-editor/tasks/update-index.yml
       vars:
         destination:
-          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch.hlinux[ansible_architecture] }}/"
-          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch.rhel[ansible_architecture] }}/"
-          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch.sles[ansible_architecture] }}/"
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.hlinux[ansible_architecture] }}/"
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.rhel[ansible_architecture] }}/"
+          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.sles[ansible_architecture] }}/"

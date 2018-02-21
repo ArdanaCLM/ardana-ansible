@@ -20,7 +20,7 @@
   stat:
     path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ item }}"
   register: _venv_present_result
-  with_items: package_venv_locations_multi_arch.values() | map('values') | sum(start=[]) | list
+  with_items: package_venv_locations.values() | map('values') | sum(start=[]) | list
 
 - name: package-repo | configure | Ready the index
   become: yes
