@@ -50,9 +50,9 @@ venv_locs:
 distro_list: "{{ hostvars['localhost']['distro_list'] }}"
 
 pkg_locs:
-  debian: "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.hlinux }}"
-  redhat:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.rhel }}"
-  suse:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.sles }}"
+  debian: "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations_multi_arch.hlinux[ansible_architecture] }}"
+  redhat:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations_multi_arch.rhel[ansible_architecture] }}"
+  suse:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations_multi_arch.sles[ansible_architecture] }}"
 
 pkg_manifests:
   debian: "{{ (pkg_locs.debian + '/packages') | load_packages() }}"

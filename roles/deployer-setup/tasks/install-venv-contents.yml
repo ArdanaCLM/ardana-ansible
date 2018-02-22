@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -28,7 +28,7 @@
 - name: deployer-setup | install-venv-contents | Ensure venv os dir exits exists
   become: yes
   file:
-    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations[item.item.key] }}"
+    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch[item.item.key][ansible_architecture] }}"
     state: directory
   when: item.stat.exists
   with_items: _venv_tar_result.results
@@ -37,7 +37,7 @@
   become: yes
   unarchive:
     src: "{{ ardanauser_home }}/{{ item.item.value }}"
-    dest: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations[item.item.key] }}"
+    dest: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations_multi_arch[item.item.key][ansible_architecture] }}"
     owner: root
     group: root
     copy: no
