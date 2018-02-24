@@ -68,6 +68,23 @@
     path: "{{ log_dir }}"
     state: directory
 
+- name: installui | configure | Create log file if non-existent
+  become: yes
+  copy:
+    content: ""
+    dest: "{{ log_dir }}/{{ server_comp }}.log"
+    force: no
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+
+- name: installui | configure | Change permissions of existing log file
+  become: yes
+  file:
+    owner: "{{ ardanauser }}"
+    group: "{{ ardanauser }}"
+    path: "{{ log_dir }}/{{ server_comp }}.log"
+    state: file
+
 - name: installui | configure | Apply systemd template
   become: yes
   template:
