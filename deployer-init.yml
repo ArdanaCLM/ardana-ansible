@@ -130,4 +130,3 @@
 
 # Install and run ardana-service, for which Day Zero UI is dependent on
 - include: ardana-service-deploy.yml
-  when: deployer_media_legacy_layout|bool
