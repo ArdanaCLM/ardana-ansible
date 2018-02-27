@@ -39,5 +39,5 @@
   vars:
     playbook_name: "site.yml"
 # Asynchronous delayed reset to switch ardana-service to use keystone
-- include: _ardana-service-delayed-reset.yml
+#- include: _ardana-service-delayed-reset.yml   # until bsc#1082929 is fixed
 
