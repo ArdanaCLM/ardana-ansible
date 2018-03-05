@@ -35,7 +35,7 @@ server_restart_required: false
 log_dir: "/var/log/ardana_installer"
 tmp_dir: "/var/cache/ardana_installer"
 
-systemd_config_dir: "/usr/lib/systemd/system/{{ server_comp }}.service.d"
+systemd_config_dir: "/etc/systemd/system/{{ server_comp }}.service.d"
 systemd_config_file: "{{ systemd_config_dir }}/local.conf"
 db_file: "{{ tmp_dir }}/db.json"
 progress_file: "{{ tmp_dir }}/progress.json"
