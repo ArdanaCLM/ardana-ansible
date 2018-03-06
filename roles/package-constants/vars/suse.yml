@@ -15,4 +15,4 @@
 # under the License.
 #
 ---
-package_venv_path_os_family: "{{ package_venv_locations_multi_arch.sles[ansible_architecture] }}"
+package_venv_path_os_family: "{{ package_venv_locations.sles[ansible_architecture] }}"
