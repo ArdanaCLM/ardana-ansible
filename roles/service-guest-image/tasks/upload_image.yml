@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,9 +16,20 @@
 #
 ---
 
+# set the guest image name
+- name: service-guest-image | upload-image | set image name for legacy media layout
+  set_fact:
+      img_name: "{{ IMAGE_NAME }}_{{ PRODUCT }}"
+  when: deployer_media_legacy_layout | bool
+
+- name: service-guest-image | upload-image | set image name for non legacy media layout
+  set_fact:
+      img_name: "{{ IMAGE_NAME }}"
+  when: not (deployer_media_legacy_layout | bool)
+
 # check for existing images with matching name to the new image
-- name: upload-image | get_image_from_glance | get list of image ids
-  shell: "{{ GLANCE_CLIENT }} image-list | grep {{ IMAGE_NAME }}_{{ PRODUCT }}| tr -d ' ' | cut -f 2 -d '|'"
+- name: service-guest-image | upload-image | get list of image ids
+  shell: "{{ GLANCE_CLIENT }} image-list | grep {{ img_name }}| tr -d ' ' | cut -f 2 -d '|'"
   environment: &OS_ENV
     OS_AUTH_URL: "{{ openstack_auth_url }}"
     OS_ENDPOINT_TYPE: "{{ openstack_endpoint_type }}"
@@ -32,7 +43,7 @@
   run_once: true
 
 # if there is a match get the checksum, id and status for the image
-- name: upload-image | get_image_from_glance | get image details for matched ids
+- name: service-guest-image | upload-image | get image details for matched ids
   shell: "{{ GLANCE_CLIENT }} image-show {{ item}} | tr -d ' ' | egrep '(checksum|id|status)'"
   environment: *OS_ENV
   with_items: "{{image_id_list.stdout_lines}}"
@@ -40,15 +51,22 @@
   register: image_details
   run_once: true
 
-# get the md5sum for the new image
-- name: upload-image | get_image_from_glance | get checksum for new image
+# get the md5sum for the new image - legacy
+- name: service-guest-image | upload-image | get checksum for new image for legacy
   shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2 | cut -d ' ' -f 1"
   register: image_checksum
-  when: image_id_list.stdout != "" and image_details.results|length > 0
+  when: image_id_list.stdout != "" and image_details.results|length > 0 and (deployer_media_legacy_layout | bool)
+  run_once: true
+
+# get the md5sum for the new image - non legacy
+- name: service-guest-image | upload-image | get checksum for new image for non legacy
+  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
+  register: image_checksum
+  when: image_id_list.stdout != "" and image_details.results|length > 0 and not (deployer_media_legacy_layout | bool)
   run_once: true
 
 # verify if the md5sum match and if the image is in ACTIVE status
-- name: upload-image | get_image_from_glance | verify image checksum and status
+- name: service-guest-image | upload-image | verify image checksum and status
   shell: "echo '{{ item.stdout }}' | grep id | cut -d '|' -f 3"
   with_items: "{{ image_details.results if image_id_list.stdout != '' and image_details.results|length > 0 else []}}"
   when: item.stdout != "" and image_checksum.stdout != "" and "|checksum|{{image_checksum.stdout}}" in "{{item.stdout}}" and "|status|active|" in "{{item.stdout}}"
@@ -56,7 +74,7 @@
   run_once: true
 
 # Use the id of the first image which matches the checksum
-- name: upload-image | get_image_from_glance | get the image id
+- name: service-guest-image | upload-image | get the image id
   shell: "echo {{ item.stdout }}"
   with_items: "{{ matched_image_ids.results | default([])}}"
   when: matched_image_ids is defined and not item|skipped and matched_image_ids.changed ==true and matched_image_ids.results|length > 0
@@ -64,26 +82,37 @@
   run_once: true
 
 # export the matched image id from glance lookup to be used in service configuration
-- name: upload-image | get_image_from_glance | use image id from glance lookup
+- name: service-guest-image | upload-image | use image id from glance lookup
   set_fact:
     service_guest_image_id: "{{ item }}"
   with_items: "{{image_id_from_glance_lookup.results | default([])}}"
   when: image_id_from_glance_lookup is defined and not item|skipped and image_id_from_glance_lookup.changed == true
   run_once: true
 
-# upload new image in glance, if current image is not found in glance
-- name: upload-image | upload_image | Upload new datastore images
-  shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}_{{ PRODUCT }}
+# upload new image in glance, if current image is not found in glance for legacy
+- name: service-guest-image | upload-image | Upload new datastore images for legacy
+  shell: "{{ GLANCE_CLIENT }} image-create --name {{ img_name }}
   --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2
   --container-format bare --disk-format qcow2
   --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
   register: image_id_from_glance_upload
   environment: *OS_ENV
-  when: image_id_from_glance_lookup.changed == false
+  when: image_id_from_glance_lookup.changed == false and (deployer_media_legacy_layout | bool)
+  run_once: true
+
+# upload new image in glance, if current image is not found in glance for non legacy
+- name: service-guest-image | upload-image | Upload new datastore image for non legacy
+  shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}
+  --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2
+  --container-format bare --disk-format qcow2
+  --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
+  register: image_id_from_glance_upload
+  environment: *OS_ENV
+  when: image_id_from_glance_lookup.changed == false and not (deployer_media_legacy_layout | bool)
   run_once: true
 
 # if the image upload was done then export the new image id to be used in service configuration
-- name: upload-image | get_image_from_glance | use image id from glance upload
+- name: service-guest-image | upload-image | use image id from glance upload
   set_fact:
     service_guest_image_id: "{{image_id_from_glance_upload}}"
   when: image_id_from_glance_lookup.changed == false and image_id_from_glance_upload.stdout != ""
