@@ -35,5 +35,5 @@ ui_home = {{ ui_comp_dir }}
 {%- endif %}
 
 {% if OPS_WEB is defined -%}
-  opsconsole: {{ OPS_WEB.advertises.vips.private[0].url }}
+  opsconsole: {{ OPS_WEB.advertises.vips.public[0].url }}
 {%- endif %}
