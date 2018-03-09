@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,21 +14,11 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+# Check if zypper configuration is broken
 ---
-- name: deployer-setup | check-sles-cdrom-sources | Check if CD source exists
-  shell: zypper repos | grep -i sles
-  register: cd_source_result
-  failed_when: false
-
-- name: deployer-setup | check-sles-cdrom-sources | Verify mounted image
-  stat:
-    path: /media/cdrom/suse
-  register: image_verify_result
-
-- name: deployer-setup | check-sles-cdrom-sources | Present error message
-  fail:
-    msg: "sles disk is not mounted."
-  when: >
-    cd_source_result.rc == 0 and
-    not image_verify_result.stat.exists
-
+- hosts: localhost
+  connection: local
+  roles:
+    - osconfig
+  tasks:
+    - include: roles/osconfig/tasks/check-product-status.yml
