@@ -15,6 +15,38 @@
 # under the License.
 #
 ---
+# Install and configure apache2 for venv and install ardana-input-model
+- hosts: localhost
+  connection: local
+  roles:
+    - cobbler
+    - FND-AP2
+    - package-consumer # Needed for PACKAGE_CONSTANTS details
+  tasks:
+    # Deploy Apache
+    - include: roles/FND-AP2/tasks/install.yml
+    - include: roles/FND-AP2/tasks/configure.yml
+      vars:
+        host:
+          vars:
+        FND_AP2_sites_enabled:
+          deployer_venv_server.conf:
+            listen: "*"
+            port: "{{ hlinux_server_port }}"
+            document_root: "{{ PACKAGE_CONSTANTS.REPO_DIR }}"
+            additional_dirs:
+              SUSE-12-3: /srv/www/suse-12.3
+
+# Start depends on a notification from above,
+# split it out to make sure the handler fires first
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  roles:
+    - FND-AP2
+  tasks:
+    - include: roles/FND-AP2/tasks/start.yml
+
 - hosts: localhost
   connection: local
   roles:
@@ -33,38 +65,8 @@
     - include: roles/osconfig/tasks/setup-zypp.yml
       vars:
           zypp_server: "dir:{{ PACKAGE_CONSTANTS.REPO_DIR }}"
+          zypp_server_http: "http://localhost:79"
       when: ansible_os_family | lower | search('suse')
-
-# Install and configure apache2 for venv and install ardana-input-model
-- hosts: localhost
-  connection: local
-  gather_facts: no
-  roles:
-    - cobbler
-    - FND-AP2
-    - package-consumer # Needed for PACKAGE_CONSTANTS details
-  tasks:
-    # Deploy Apache
-    - include: roles/FND-AP2/tasks/install.yml
-    - include: roles/FND-AP2/tasks/configure.yml
-      vars:
-        host:
-          vars:
-        FND_AP2_sites_enabled:
-          deployer_venv_server.conf:
-            listen: "*"
-            port: "{{ hlinux_server_port }}"
-            document_root: "{{ PACKAGE_CONSTANTS.REPO_DIR }}"
-
-# Start depends on a notification from above,
-# split it out to make sure the handler fires first
-- hosts: localhost
-  connection: local
-  gather_facts: no
-  roles:
-    - FND-AP2
-  tasks:
-    - include: roles/FND-AP2/tasks/start.yml
 
 # Install contents of repos
 - hosts: localhost
