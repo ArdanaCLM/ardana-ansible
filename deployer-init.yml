@@ -81,7 +81,6 @@
       when: deployer_media_legacy_layout|bool == false
     - include: roles/deployer-setup/tasks/install-venv-contents.yml
     - include: roles/deployer-setup/tasks/install-rhel-support.yml
-    - include: roles/deployer-setup/tasks/init-deployer-from-iso.yml
 
 # Install & configure venv application
 - hosts: localhost
