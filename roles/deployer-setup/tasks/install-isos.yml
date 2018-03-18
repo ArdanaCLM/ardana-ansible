@@ -46,3 +46,43 @@
     find_iso_marker_file_line: "Red Hat Enterprise Linux "
     find_iso_target_dir:
       "{{ PACKAGE_CONSTANTS.REPO_DIR }}/ardana/rhel7/yum/OS"
+
+- name: deployer-setup | install-isos | Get SOC8 ISO path
+  find_zypper_iso:
+    name: SUSE-OPENSTACK-CLOUD-8
+  become: yes
+  register: soc8_iso
+
+- name: deployer-setup | install-isos | Get HOS8 ISO path
+  find_zypper_iso:
+    name: HPE-HELION-OPENSTACK-CLOUD
+  become: yes
+  register: hos8_iso
+
+- name: deployer-setup | install-isos | Fail if both flavors are present
+  fail: >
+    Found both SUSE OpenStack Cloud 8 and HPE Helion OpenStack Cloud 8 present
+    on the system. Remove one to continue.
+  when: soc8_iso.path != '' and hos8_iso.path != ''
+
+- include: "find-iso.yml"
+  vars:
+    find_iso_header: "SUSE OpenStack Cloud 8"
+    find_iso_file: "{{ soc8_iso.path }}"
+    find_iso_mount_dir: ""
+    find_iso_marker_file: "media.1/products"
+    find_iso_marker_file_line: "SOC8 8-0"
+    find_iso_target_dir:
+      "/srv/www/suse-{{ansible_distribution_version}}/{{ ansible_architecture }}/repos/Cloud"
+  when: soc8_iso.path != ''
+
+- include: "find-iso.yml"
+  vars:
+    find_iso_header: "HPE Helion OpenStack Cloud 8"
+    find_iso_file: "{{ hos8_iso.path }}"
+    find_iso_mount_dir: ""
+    find_iso_marker_file: "media.1/products"
+    find_iso_marker_file_line: "HOS8 8-0"
+    find_iso_target_dir:
+      "/srv/www/suse-{{ansible_distribution_version}}/{{ ansible_architecture }}/repos/Cloud"
+  when: hos8_iso.path != '' and soc8_iso.path == ''
