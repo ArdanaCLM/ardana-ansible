@@ -1,0 +1,54 @@
+{#
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+#}
+sosreport-upgrade
+monasca-agent-upgrade
+# Update Monasca agent for RabbitMQ.
+rabbitmq-monasca-configure
+clients-upgrade
+#percona-upgrade
+FND-AP2-upgrade
+memcached-upgrade
+keystone-upgrade
+barbican-upgrade
+zookeeper-upgrade
+monasca-upgrade
+ardana-service-upgrade
+# ops console depends on kafka, installed by monasca
+ops-console-upgrade
+spark-upgrade
+monasca-transform-upgrade
+swift-upgrade
+nova-upgrade
+magnum-upgrade
+glance-upgrade
+neutron-upgrade
+cinder-upgrade
+octavia-upgrade
+designate-upgrade
+powerdns-upgrade
+bind-upgrade
+ironic-upgrade
+heat-upgrade
+horizon-upgrade
+logging-upgrade
+ceilometer-upgrade
+freezer-upgrade
+tempest-upgrade
+# Update haproxy last as it conflicts with a setting in the beta2 kit
+# where nova-api listens on the vip.
+FND-CLU-upgrade

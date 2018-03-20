@@ -42,6 +42,7 @@ deployer_setup_hook_plays:
     - stop
     - upgrade
     - upgrade-from-legacy
+    - update
 deployer_setup_deploy_dir: "{{ playbook_dir }}"
 deployer_setup_play_templates:
   - ardana-{{ item }}.yml.j2
