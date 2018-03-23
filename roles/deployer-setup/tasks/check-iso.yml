@@ -25,6 +25,7 @@
 # check_iso_marker_file_line - regexp to check in first 2 lines of the file
 ---
 - name: deployer-setup | check-iso | Check if ISO file exists
+  become: yes
   stat:
     path: "{{ check_iso_file }}"
   register: check_iso_file_exists_result
