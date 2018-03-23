@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -19,14 +19,32 @@
 - name: service-guest-image | extract_guest-image | create temporary directory
   command: mktemp -d
   register: src_guest_image_tempdir
+  when: deployer_media_legacy_layout | bool
 
 - name: service-guest-image | extract_guest-image | extract archive
   unarchive: src={{ service_package }} dest={{ src_guest_image_tempdir.stdout }}
+  when: deployer_media_legacy_layout | bool
 
 - name: service-guest-image | extract_guest-image | get manifest file name
   shell: ls {{ src_guest_image_tempdir.stdout }}/*.yml
   register: manifest_file_name
+  when: deployer_media_legacy_layout | bool
 
 - name: service-guest-image | extract_guest-image | load guest-image metadata
   include_vars: "{{manifest_file_name.stdout}}"
   register: guest_image_metadata
+  when: deployer_media_legacy_layout | bool
+
+- name: service-guest-image | extract_guest-image | extract the rpm file
+  become: yes
+  zypper:
+    name: "{{ service_package }}"
+    state: present
+  when: not (deployer_media_legacy_layout | bool)
+
+- name: service-guest-image | extract_guest-image | register the qcow2 image file
+  shell: ls openstack-octavia-amphora-image*.qcow2
+  args:
+    chdir: "/srv/tftpboot/files/openstack-octavia-amphora-image"
+  register: src_octavia_image_file_name
+  when: not (deployer_media_legacy_layout | bool)
