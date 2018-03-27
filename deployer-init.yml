@@ -56,7 +56,10 @@
   tasks:
     - include_vars: roles/deployer-setup/defaults/ardana_tar_locations.yml
     - include: roles/deployer-setup/tasks/install.yml
-    - include: roles/deployer-setup/tasks/install-isos.yml
+    - include: roles/deployer-setup/tasks/install-isos-legacy.yml
+      when: deployer_media_legacy_layout|bool
+    - include: roles/deployer-setup/tasks/install-isos-product.yml
+    - include: roles/deployer-setup/tasks/install-isos-rhel.yml
     - include: roles/deployer-setup/tasks/configure-bash.yml
     - include: roles/deployer-setup/tasks/init-third-party.yml
     - include: roles/deployer-setup/tasks/install-sles-support.yml

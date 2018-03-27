@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -13,10 +12,17 @@
 # WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
 # License for the specific language governing permissions and limitations
 # under the License.
-#
-# Check if apt configuration is broken
+
 ---
-- hosts: localhost
-  connection: local
-  tasks:
-    - include: roles/deployer-setup/tasks/check-cdrom-sources.yml
+
+# include with with_items is deprecated/removed in ansible 1.9.6
+
+- include: "find-iso.yml"
+  vars:
+    find_iso_header: "Red Hat Enterprise Linux"
+    find_iso_file: "{{ ardanauser_home }}/{{ deployer_rhel7_iso }}"
+    find_iso_mount_dir: "/media/rhel"
+    find_iso_marker_file: ".discinfo"
+    find_iso_marker_file_line: "Red Hat Enterprise Linux "
+    find_iso_target_dir:
+      "{{ PACKAGE_CONSTANTS.REPO_DIR }}/ardana/rhel7/yum/OS"
