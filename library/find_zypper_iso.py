@@ -60,12 +60,13 @@ def _get_iso_uri(name):
 
 
 def _get_file_path(iso_uri):
-    iso_uri = iso_uri.replace('iso:///?', '')
-    iso, dir = iso_uri.split('&')
-    iso = iso.replace('iso=', '')
-    dir = dir.replace('url=', '')
-    dir = unquote(dir).replace('dir:', '')
-    return dir + '/' + iso
+    iso_uri = iso_uri.replace('iso:///?iso=', '')
+    if '&' in iso_uri:
+        iso, dir = iso_uri.split('&')
+        dir = dir.replace('url=', '')
+        dir = unquote(dir).replace('dir:', '')
+        return dir + '/' + iso
+    return iso_uri
 
 
 def main():
