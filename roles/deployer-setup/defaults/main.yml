@@ -38,6 +38,8 @@ deployer_setup_hook_plays:
     - rabbitmq-credentials-change
     - reconfigure
     - start
+    - restart
+    - schedule-restart
     - status
     - stop
     - upgrade
