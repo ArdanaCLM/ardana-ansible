@@ -1,0 +1,161 @@
+{#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#}
+{% extends "_ardana-default.yml.j2" %}
+
+{% block header %}
+# Pre-Upgrade Phase
+- include: ardana-upgrade-pkg-query.yml
+- include: upgrade-bootstrap.yml
+- include: _osconfig-pre-upgrade.yml
+# Bypass pre-upgrade scripts for services
+# which will be installed for the first time
+# or undergo major upgrades (monasca, rmq, db)
+#- include: _ardana-service-pre-upgrade.yml
+
+- include: FND-CLU-pre-upgrade.yml
+- include: FND-AP2-pre-upgrade.yml
+- include: kronos-pre-upgrade.yml
+
+- include: _ardana-base-pre-upgrade.yml
+
+- include: rabbitmq-stop.yml
+  vars:
+    rabbitmq_do_not_reset_node: true
+
+- hosts: FND-MDB
+  max_fail_percentage: 0
+  roles:
+    - FND-MDB
+  vars:
+    - mysql_is_major_upgrade: true
+  tasks:
+    - include: roles/FND-MDB/tasks/status.yml
+    - include: roles/FND-MDB/tasks/configure.yml
+    - include: roles/FND-MDB/tasks/create_service_users_dbs.yml
+    - include: roles/FND-MDB/tasks/_pre_upgrade.yml
+
+- hosts: FND-MDB
+  max_fail_percentage: 0
+  serial: 1
+  roles:
+    - FND-MDB
+  vars:
+    - mysql_is_major_upgrade: true
+  tasks:
+    - include: roles/FND-MDB/tasks/check_install.yml
+    - include: roles/FND-MDB/tasks/_suse_install.yml
+
+# Upgrade phase
+- include: _ardana-upgrade-base.yml
+
+- hosts: FND-MDB
+  max_fail_percentage: 0
+  roles:
+    - FND-MDB
+  vars:
+    - mysql_is_major_upgrade: true
+  tasks:
+    - include: roles/FND-MDB/tasks/_post_upgrade.yml
+
+- hosts: FND-RMQ
+  max_fail_percentage: 0
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+      vars:
+        service: epmd.socket
+    - include: _ardana-remove-legacy-service.yml
+      vars:
+        service: epmd
+    - pause:
+        seconds: 5
+    - command: pkill epmd
+      become: true
+      ignore_errors: true
+
+- include: rabbitmq-disaster-recovery.yml
+
+- include: _osconfig-upgrade.yml
+
+- hosts: MON-AGN
+  max_fail_percentage: 0
+  become: yes
+  vars_files:
+    - roles/monasca-variables/vars/configuration.yml
+    - roles/monasca-variables/vars/suse.yml
+    - roles/monasca-variables/defaults/main.yml
+    - roles/monasca-agent/vars/main.yml
+    - roles/monasca-agent/vars/suse.yml
+    - roles/monasca-agent/defaults/main.yml
+  vars:
+    - old_monasca_agent_user_name: mon-agent
+    - old_monasca_agent_group_name: mon-agent
+  tasks:
+  - service:
+      name: monasca-agent
+      state: stopped
+      enabled: false
+    become: yes
+  - include: roles/monasca-agent/tasks/configure.yml
+  - shell: |
+      chown {{ '--from={{ old_monasca_agent_user_name }}:adm {{ monasca_agent_user_name }}:adm' }} / -R
+      chown {{ '--from={{ old_monasca_agent_user_name }}:{{ old_monasca_agent_group_name }} {{ monasca_agent_user_name }}:{{ monasca_agent_group_name }}' }} / -R
+    become: yes
+    ignore_errors: true
+
+- hosts: KEY-API
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+  vars:
+    - service: barbican-api
+
+- hosts: SWF-PRX
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+  vars:
+    - service: swiftlm-access-log-tailer
+
+- hosts: SWF-ACC:SWF-CON:SWF-OBJ:SWF-PRX
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+  vars:
+    - service: swiftlm-mount
+
+- hosts: SWF-PRX--first-member
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+  vars:
+    - service: swiftlm-uptime-monitor
+
+- hosts: LOG-PRO
+  tasks:
+    - include: _ardana-remove-legacy-service.yml
+  vars:
+    - service: beaver
+{% endblock %}
+
+{% block footer %}
+
+# Post-Upgrade phase
+- include: _osconfig-post-upgrade.yml
+#- include: _ardana-service-post-upgrade.yml
+- include: FND-CLU-post-upgrade.yml
+- include: FND-AP2-post-upgrade.yml
+- include: _ardana-base-post-upgrade.yml
+- include: ardana-upgrade-pkg-verify.yml
+# Ensure that spark-master service is running before checking status
+- include: spark-start.yml
+- include: ardana-status.yml
+{% endblock %}
