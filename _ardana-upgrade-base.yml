@@ -42,17 +42,38 @@
       dpkg_options: force-overwrite,force-confdef,force-confold
     when: ansible_os_family | lower == 'debian'
 
-  # Upgrade from scp to newton need to reinstall pkgs with invalid vendor(OBS)
-  # Repo name reference is from BUG 2848
-  - name: _ardana-upgrade-base | Apply package upgrades
+  - name: _ardana-upgrade-base | Add SLES and Cloud repos
+    set_fact:
+      _repositories:
+        - SLES-OS
+        - Cloud
+        - PTF
+        - SLES12-SP3-Pool
+        - SLES12-SP3-Updates
+        - OpenStack-Cloud-8-Pool
+        - OpenStack-Cloud-8-Updates
+    when: ansible_os_family | lower == 'suse'
+
+  - name: _ardana-upgrade-base | Determine the repos currently installed
     become: yes
-    shell: |
-      zypper dup -y --no-recommends --allow-vendor-change \
-        --from "Cloud" \
-        --from "SLES12-SP3-Pool" \
-        --from "SLES12-SP3-Updates" \
-        --from "OpenStack-Cloud-8-Pool" \
-        --from "OpenStack-Cloud-8-Updates"
+    # stdout will be comprised of lines like " <repo-alias> "
+    shell: zypper repos | tail "-n +2" | cut -d'|' -f2
+    register: _existing_repos_result
+    when: ansible_os_family | lower == 'suse'
+
+  - name: osconfig | setup-zypp | Generate SLES repos exists map
+    set_fact:
+      _dup_flags: >
+        {%- set _flags = [] -%}
+        {%- for r in _repositories if " " + r + " " in _existing_repos_result.stdout -%}
+        {%-   set _ = _flags.append("--from " + r) -%}
+        {%- endfor -%}
+        {{ _flags }}
+    when: ansible_os_family | lower == 'suse'
+
+  - name: _ardana-upgrade-base | Download and install package upgrades
+    become: yes
+    command: zypper dup --download in-advance -y --no-recommends --allow-vendor-change {{ _dup_flags | join(' ') }}
     when: ansible_os_family | lower == 'suse'
 
   # Upgrade from 2.x to 3.0 need to 'cleanup' the /etc/init.d/openvswitch-switch

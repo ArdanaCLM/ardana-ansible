@@ -58,6 +58,14 @@
     - include: roles/FND-MDB/tasks/check_install.yml
     - include: roles/FND-MDB/tasks/_suse_install.yml
 
+# zypper dup will be unable to resolve conflicts with this package present
+- hosts: SWF-ACC:SWF-OBJ:SWF-PRX:SWF-CON
+  tasks:
+    - become: yes
+      package:
+        state: absent
+        name: liberasurecode-devel
+
 # Upgrade phase
 - include: _ardana-upgrade-base.yml
 
