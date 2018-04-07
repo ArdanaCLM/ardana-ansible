@@ -1,0 +1,44 @@
+{#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#}
+{% extends "_ardana-default.yml.j2" %}
+
+{% block header %}
+# Pre-Update Phase
+- include: osconfig-status.yml
+- include: ardana-status.yml
+  when: precheck_status | default(false) | bool
+
+#- include: ardana-pre-upgrade-status.yml
+#- include: ardana-upgrade-pkg-query.yml
+#- include: upgrade-bootstrap.yml
+#- include: _osconfig-pre-upgrade.yml
+#- include: _ardana-service-pre-upgrade.yml
+#- include: _ardana-base-pre-upgrade.yml
+# Update phase
+#- include: _ardana-upgrade-base.yml
+- include: _osconfig-upgrade.yml
+
+{% endblock %}
+
+{% block footer %}
+
+# Post-Update phase
+#- include: _osconfig-post-upgrade.yml
+#- include: _ardana-service-post-upgrade.yml
+#- include: _ardana-base-post-upgrade.yml
+#- include: ardana-upgrade-pkg-verify.yml
+- include: ardana-status.yml
+{% endblock %}
