@@ -51,8 +51,8 @@
         --from "Cloud" \
         --from "SLES12-SP3-Pool" \
         --from "SLES12-SP3-Updates" \
-        --from "SUSE-OpenStack-Cloud-8-Pool" \
-        --from "SUSE-OpenStack-Cloud-8-Updates"
+        --from "OpenStack-Cloud-8-Pool" \
+        --from "OpenStack-Cloud-8-Updates"
     when: ansible_os_family | lower == 'suse'
 
   # Upgrade from 2.x to 3.0 need to 'cleanup' the /etc/init.d/openvswitch-switch
