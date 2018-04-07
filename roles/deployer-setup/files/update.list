@@ -15,7 +15,7 @@
 # under the License.
 #
 #}
-sosreport-upgrade
+supportutils-upgrade
 monasca-agent-upgrade
 # Update Monasca agent for RabbitMQ.
 rabbitmq-monasca-configure
