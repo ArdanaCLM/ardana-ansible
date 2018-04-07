@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -20,8 +20,10 @@
 - name: service-guest-image | copy-image-file | create temporary directory
   command: mktemp -d
   register: guest_image_tempdir
+  when: deployer_media_legacy_layout | bool
   run_once: true
 
 - name: service-guest-image | copy-image-file | copy image to service host
   copy: src="{{ SRC_GUEST_IMAGE_DIR }}/" dest="{{ guest_image_tempdir.stdout }}"
+  when: deployer_media_legacy_layout | bool
   run_once: true
