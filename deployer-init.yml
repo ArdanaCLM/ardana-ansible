@@ -109,17 +109,6 @@
          vars:
        is_deployer: true
 
-# Install crudini and the other prerequisites for running Ansible on the
-# deployer
-- hosts: localhost
-  connection: local
-  gather_facts: no
-  roles:
-    - osconfig
-  tasks:
-    - include: roles/osconfig/tasks/install-ansible-prereqs.yml
-      when: ansible_os_family == 'Debian'
-
 # Install config processor
 - hosts: localhost
   connection: local
