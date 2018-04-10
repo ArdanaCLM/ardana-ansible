@@ -26,6 +26,7 @@ deployer_prerequisites:
 
 deployer_packages:
     - screen
+    - createrepo
 
 deployer_input_model_src: "{{'{{ ardanauser_home }}/{{ ardana_version }}/ardana-input-model/2.0' if deployer_media_legacy_layout|bool else '/usr/share/ardana/input-model/2.0/'}}"
 

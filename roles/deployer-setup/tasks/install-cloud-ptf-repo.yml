@@ -15,9 +15,19 @@
 #
 ---
 
-- name: deployer-setup | install-createrepo-cloud-ptf | Install the script
+- name: deployer-setup | install-cloud-ptf-repo | Install createrep-cloud-ptf script
   template:
     src: createrepo-cloud-ptf.j2
     dest: /usr/local/sbin/createrepo-cloud-ptf
     mode: 0755
   become: yes
+
+- name: deployer-setup | install-cloud-ptf-repo | Create PTF repository directory
+  become: yes
+  file:
+    name: "/srv/www/suse-{{ansible_distribution_version}}/{{ ansible_architecture }}/repos/PTF"
+    state: directory
+
+- name: deployer-setup | install-cloud-ptf-repo | Create PTF repodata
+  become: yes
+  shell: /usr/local/sbin/createrepo-cloud-ptf

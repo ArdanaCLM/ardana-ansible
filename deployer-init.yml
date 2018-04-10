@@ -64,7 +64,7 @@
     - include: roles/deployer-setup/tasks/configure-bash.yml
     - include: roles/deployer-setup/tasks/init-third-party.yml
     - include: roles/deployer-setup/tasks/create-ptf-signing-key.yml
-    - include: roles/deployer-setup/tasks/install-createrepo-cloud-ptf.yml
+    - include: roles/deployer-setup/tasks/install-cloud-ptf-repo.yml
     - include: roles/deployer-setup/tasks/install-sles-support.yml
     - include: roles/osconfig/tasks/check-for-zypp-repo.yml
       when: ansible_os_family | lower | search('suse')
