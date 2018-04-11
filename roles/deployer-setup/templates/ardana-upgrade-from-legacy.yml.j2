@@ -101,11 +101,6 @@
   max_fail_percentage: 0
   become: yes
   vars_files:
-    - roles/monasca-variables/vars/configuration.yml
-    - roles/monasca-variables/vars/suse.yml
-    - roles/monasca-variables/defaults/main.yml
-    - roles/monasca-agent/vars/main.yml
-    - roles/monasca-agent/vars/suse.yml
     - roles/monasca-agent/defaults/main.yml
   vars:
     - old_monasca_agent_user_name: mon-agent
@@ -115,12 +110,17 @@
       name: monasca-agent
       state: stopped
       enabled: false
-    become: yes
-  - include: roles/monasca-agent/tasks/configure.yml
+  - group:
+      name: {{ '"{{ monasca_agent_group_name }}"' }}
+      system: yes
+  - user:
+      name: {{ '"{{ monasca_agent_user_name }}"' }}
+      system: yes
+      groups: {{ '"{{ monasca_agent_group_name }}"' }}
+      shell: {{ '"{{ monasca_agent_shell }}"' }}
   - shell: |
       chown {{ '--from={{ old_monasca_agent_user_name }}:adm {{ monasca_agent_user_name }}:adm' }} / -R
       chown {{ '--from={{ old_monasca_agent_user_name }}:{{ old_monasca_agent_group_name }} {{ monasca_agent_user_name }}:{{ monasca_agent_group_name }}' }} / -R
-    become: yes
     ignore_errors: true
 
 - hosts: KEY-API
@@ -152,6 +152,30 @@
     - include: _ardana-remove-legacy-service.yml
   vars:
     - service: beaver
+
+- hosts: FRE-API
+  become: yes
+  roles:
+    - freezer-api
+  tasks:
+    - file:
+        path: /etc/apache2/vhosts.d/freezer-modwsgi.conf
+        state: absent
+    - include: roles/FND-AP2/tasks/start_reload.yml
+      vars:
+        apache_restart_requested: yes
+
+- hosts: LOG-SVR
+  become: yes
+  roles:
+    - logging-server
+  tasks:
+    - file:
+        path: /etc/apache2/vhosts.d/kronos-apache2.conf
+        state: absent
+    - include: roles/FND-AP2/tasks/start_reload.yml
+      vars:
+        apache_restart_requested: yes
 {% endblock %}
 
 {% block footer %}
