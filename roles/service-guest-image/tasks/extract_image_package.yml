@@ -19,7 +19,6 @@
 - name: service-guest-image | extract_guest-image | create temporary directory
   command: mktemp -d
   register: src_guest_image_tempdir
-  when: deployer_media_legacy_layout | bool
 
 - name: service-guest-image | extract_guest-image | extract archive
   unarchive: src={{ service_package }} dest={{ src_guest_image_tempdir.stdout }}
@@ -48,4 +47,11 @@
   args:
     chdir: "/srv/tftpboot/files/openstack-octavia-amphora-image"
   register: src_octavia_image_file_name
+  when: not (deployer_media_legacy_layout | bool)
+
+- name: service-guest-image | extract_guest-image | copy image to temp_dir
+  become: yes
+  shell: cp openstack-octavia-amphora-image*.qcow2 {{ src_guest_image_tempdir.stdout }}
+  args:
+    chdir: "/srv/tftpboot/files/openstack-octavia-amphora-image"
   when: not (deployer_media_legacy_layout | bool)
