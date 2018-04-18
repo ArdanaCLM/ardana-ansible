@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017-2018 SUSE LLC
+# (c) Copyright 2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -15,17 +14,12 @@
 # under the License.
 #
 ---
+# Node reboot was completed successfully, reset the pending reboot status
+# variable (useful on the deployer, which is rebooted manually)
+- include: _ardana-update-status.yml
+  vars:
+    update_status_var: system-reboot
+    update_status_reset: true
 
-list_pkg_upgrades_base: []
-
-zypper_update_licenses_agree: false
-zypper_update_gpg_checks: true
-zypper_update_include_reboot_patches: false
-zypper_update_method: patch
-
-running_on_deployer: false
-
-skip_single_host_checks: false
-skip_clm_updates_checks: false
-
-ardanauser_home: "{{ ansible_env['HOME'] }}"
+- include: ardana-start.yml
+- include: ardana-status.yml

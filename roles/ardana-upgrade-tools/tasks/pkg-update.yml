@@ -1,0 +1,217 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Install available zypper package updates
+#
+# The behavior can be customized with the following parameters:
+#
+#   * zypper_update_method: define which zypper subcommand to use for
+#     updating. Valid values are:
+#
+#     'patch' (default) - will install all patches applying to
+#     the system from the configured update repositories that are available.
+#
+#     'update' - will update packages from all configured repositories
+#     (not just the update repositories) that have a higher version
+#     number than the installed packages.
+#
+#     'dist-upgrade' - replaces each package installed with the version
+#     from the repository and deletes packages not available in the
+#     repositories.
+#
+#   * zypper_update_gpg_checks (default: true): enable GPG checks.
+#     If set to true, checks if packages are correctly signed.
+#
+#   * zypper_update_licenses_agree (default: false): automatically agree
+#     with licenses. If set to true, zypper automatically accepts third
+#     party licenses.
+#
+#   * zypper_update_include_reboot_patches (default: false): include patches
+#     that need reboots (e.g. kernel). Installs patches that require a reboot
+#     (for example kernel or glibc updates).
+#
+# Sets the following facts:
+#
+#   * ardana_upgraded_pkgs - list of upgraded packages
+#   * ardana_notify_pending_service_update (persistent) - set when at least one
+#     package has been updated, to indicate that services need to be updated
+#   * ardana_notify_pending_clm_update (persistent) - this flag is set when at
+#     least one of the packages used by the CLM itself (e.g. playbook packages)
+#     has been updated
+#   * ardana_notify_pending_venv_update (persistent) - this flag is set when at
+#     least one of the venv packages has been updated
+#   * ardana_notify_pending_system_reboot (persistent) - this flag is set if a
+#     system reboot is required after the installed package updates
+---
+
+- name: ardana-upgrade-tools | pkg-update | Validate update method
+  fail:
+    msg:
+      "{{ zypper_update_method }} is not a valid zypper update method."
+  when: zypper_update_method not in ["patch", "update", "dist-upgrade"]
+
+- name: ardana-upgrade-tools | pkg-update | Generate zypper update command args
+  set_fact:
+    _zypper_args: >
+      {%- set _args = ["--non-interactive"] -%}
+      {%- if not zypper_update_gpg_checks | bool -%}
+      {%-   set _ = _args.append("--no-gpg-checks") -%}
+      {%- endif -%}
+      {%- if zypper_update_method == "patch" and zypper_update_include_reboot_patches | bool -%}
+      {%-   set _ = _args.append("--non-interactive-include-reboot-patches") -%}
+      {%- endif -%}
+      {%- set _ = _args.append(zypper_update_method) -%}
+      {%- if zypper_update_licenses_agree | bool -%}
+      {%-   set _ = _args.append("--auto-agree-with-licenses") -%}
+      {%- endif -%}
+      {{ _args }}
+
+- name: ardana-upgrade-tools | pkg-update | Check if the PTF repository is configured
+  become: yes
+  shell: zypper lr PTF
+  register: _ptf_repo_result
+  ignore_errors: true
+
+- name: ardana-upgrade-tools | pkg-update | Refresh PTF repository
+  become: yes
+  command: zypper --non-interactive --gpg-auto-import-keys refresh -fr PTF
+  when: _ptf_repo_result | success
+
+- name: ardana-upgrade-tools | pkg-update | Get set of installed pkgs before update
+  rpm_list:
+
+- name: ardana-upgrade-tools | pkg-update  | Set _pre_update_pkgs fact
+  set_fact:
+    _pre_update_pkgs: "{{ installed_pkgs | default([]) }}"
+
+# Sometimes zypper needs to go through several iterations when installing
+# patches, e.g. when those patches include updates to the zypper packages
+# themselves. This will be indicated by a 103 return code.
+- name: ardana-upgrade-tools | pkg-update | Download and install package updates
+  become: yes
+  command: zypper {{ _zypper_args | join(' ') }} --download in-advance
+  register: zypper_update_result
+  until: zypper_update_result.rc != 103 # ZYPPER_EXIT_INF_RESTART_NEEDED
+  retries: 5
+  ignore_errors: yes
+
+- name: ardana-upgrade-tools | pkg-update | Get set of installed pkgs after update
+  rpm_list:
+
+- name: _ardana-update-base | Set _post_update_pkgs fact
+  set_fact:
+    _post_update_pkgs: "{{ installed_pkgs | default([]) }}"
+
+- name: ardana-upgrade-tools | pkg-update | Set fact with full set of updated pkgs
+  set_fact:
+    ardana_upgraded_pkgs: "{{ _pre_update_pkgs | upgraded_pkgs(_post_update_pkgs) }}"
+
+- name: ardana-upgrade-tools | pkg-update | Print updated packages
+  debug:
+    msg: "The following packages have been updated: {{ ardana_upgraded_pkgs.keys() | join(', ') }}"
+  when: ardana_upgraded_pkgs
+
+- name: ardana-upgrade-tools | pkg-update | Get set of installed CLM pkgs
+  shell: rpm -qa --qf "%{NAME}\n" | grep ardana
+  register: _ardana_clm_packages
+  when: running_on_deployer
+
+- name: ardana-upgrade-tools | pkg-update | Get set of installed venv pkgs
+  command: rpm -qf /opt/ardana_packager --qf "%{NAME}\n"
+  register: _ardana_venv_packages
+  when: running_on_deployer
+
+- name: ardana-upgrade-tools | pkg-update | Check if CLM packages were updated
+  set_fact:
+    _clm_packages_updated: true
+  when: running_on_deployer and
+        item in ardana_upgraded_pkgs | default({})
+  with_items: _ardana_clm_packages.stdout_lines | default([])
+
+- name: ardana-upgrade-tools | pkg-update | Check if venv packages were updated
+  set_fact:
+    _venv_packages_updated: true
+  when: running_on_deployer and
+        item in ardana_upgraded_pkgs | default({})
+  with_items: _ardana_venv_packages.stdout_lines | default([])
+
+- name: ardana-upgrade-tools | pkg-update | Check if system packages were updated
+  set_fact:
+    _system_packages_updated: true
+  when: item.key not in _ardana_clm_packages.stdout_lines | default([]) and
+        item.key not in _ardana_venv_packages.stdout_lines | default([])
+  with_dict: ardana_upgraded_pkgs | default({})
+
+  # Register a persistent pending CLM update action if
+  # CLM packages were updated
+- include: check-pending-clm-update.yml
+  vars:
+    update_status_set: true
+  when: _clm_packages_updated | default(false) | bool
+
+  # Register a persistent pending service update action for this node if
+  # any packages were updated
+- include: check-pending-service-update.yml
+  vars:
+    update_status_set: true
+  when: ardana_upgraded_pkgs
+
+  # Register a persistent pending service update action for all nodes if
+  # CLM or venv packages were updated
+  # TODO(snica): this isn't working quite right (hosts are iterated, but the
+  # condition is always evaluated as false)
+- name: ardana-upgrade-tools | pkg-update |
+        Register a pending service update action for all other nodes
+  command: /bin/true
+  changed_when: true
+  register: ardana_notify_pending_service_update
+  delegate_to: "{{ item }}"
+  when: running_on_deployer and
+        (_clm_packages_updated | default(false) | bool or
+        _venv_packages_updated | default(false) | bool)
+  with_items: groups.resources
+
+  # Register a persistent pending system reboot action for this node if
+  # installed package updates require it.
+  #
+  # TODO (snica) for now we also require that a node be rebooted if system packages
+  # were updated on it (i.e. anything other than CLM and venv packages).
+  # This can be replaced with a node-wide service restart when
+  # https://gerrit.suse.provo.cloud/3745/ is merged.
+- include: check-pending-system-reboot.yml
+  vars:
+    update_status_set: true
+  when: _system_packages_updated | default(false) | bool or
+        zypper_update_result.rc == 102 # ZYPPER_EXIT_INF_REBOOT_NEEDED
+
+  # We deferred from checking the zypper update command status up to this
+  # point to get a chance to record any pending update actions as persistent facts
+- name: ardana-upgrade-tools | pkg-update | Check update result
+  fail:
+    msg:
+      "zypper {{ zypper_update_method }} command returned {{ zypper_update_result.rc }}."
+  when: zypper_update_result.rc not in [0, 100, 101, 102, 103, 104, 105]
+
+- name: ardana-upgrade-tools | pkg-update | Check number of zypper restart cycles
+  fail:
+    msg:
+      "Ran zypper {{ zypper_update_method }} more than five times,
+      and it still requires more runs."
+  when: zypper_update_result.rc == 103 # ZYPPER_EXIT_INF_RESTART_NEEDED
+
+- name: ardana-upgrade-tools | pkg-update | Check if reboot is required
+  command: /bin/true
+  register: ardana_notify_pending_system_reboot
+  when: zypper_update_result.rc == 102 # ZYPPER_EXIT_INF_REBOOT_NEEDED

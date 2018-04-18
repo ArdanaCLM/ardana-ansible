@@ -1,0 +1,51 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Use this playbook to install available system package updates
+---
+
+- hosts: resources
+  roles:
+    - ardana-upgrade-tools
+  tasks:
+
+  - include: roles/ardana-upgrade-tools/tasks/check-deployer.yml
+
+  # When running on multiple nodes (not recommended), first update packages on
+  # deployer, to account for possible CLM package updates
+  - name: _ardana-update-base | Update packages on the deployer node
+    include: roles/ardana-upgrade-tools/tasks/pkg-update.yml
+    when: ansible_os_family | lower == 'suse' and
+          install_package_updates | default(false) | bool and
+          running_on_deployer
+
+  # Bail out if CLM package updates were installed on the deployer
+  # and if other nodes are targeted by the play run
+  - include: roles/ardana-upgrade-tools/tasks/check-pending-clm-update.yml
+    when: running_on_deployer and (play_hosts | length) > 1
+
+  - name: _ardana-update-base | Fail if CLM packages were updated
+    fail:
+      msg: "{{ pending_clm_update_msg }}"
+    run_once: true
+    when: running_on_deployer and (play_hosts | length) > 1 and
+          pending_clm_update | bool
+
+  # Then install package updates on remaining nodes
+  - name: _ardana-update-base | Update packages on non deployer nodes
+    include: roles/ardana-upgrade-tools/tasks/pkg-update.yml
+    when: ansible_os_family | lower == 'suse' and
+          install_package_updates | default(false) | bool and
+          not running_on_deployer

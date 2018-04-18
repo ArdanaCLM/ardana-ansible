@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017-2018 SUSE LLC
+# (c) Copyright 2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,18 +13,9 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+# Simple task to check whether the target host is the deployer
 ---
-
-list_pkg_upgrades_base: []
-
-zypper_update_licenses_agree: false
-zypper_update_gpg_checks: true
-zypper_update_include_reboot_patches: false
-zypper_update_method: patch
-
-running_on_deployer: false
-
-skip_single_host_checks: false
-skip_clm_updates_checks: false
-
-ardanauser_home: "{{ ansible_env['HOME'] }}"
+- name: ardana-upgrade-tools | check-deployer | Check if running on deployer
+  set_fact:
+    running_on_deployer: true
+  when: hostvars[inventory_hostname].ansible_hostname == hostvars['localhost'].ansible_hostname

@@ -37,7 +37,7 @@ import subprocess
 
 def get_installed_pkgs(module):
     rpm_query_bin = module.get_bin_path('rpm')
-    cmd = [rpm_query_bin, '-qa', "--qf", "%{NAME} %{VERSION}\n"]
+    cmd = [rpm_query_bin, '-qa', "--qf", "%{NAME} %{VERSION}-%{RELEASE}\n"]
     output = subprocess.check_output(cmd).splitlines()
     installed_pkgs = {}
 

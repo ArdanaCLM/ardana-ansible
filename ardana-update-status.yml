@@ -1,0 +1,36 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# This playbook can be used to handle special ardana_notify_... variables
+# associated with outstanding update actions resulted from running the
+# update playbooks.
+#
+# The following parameters are available:
+#
+#   * update_status_var: used to select a particular update status variable.
+#     It can take the following values:
+#
+#       service-update - target the status of pending service updates
+#       clm-update - target the status of pending CLM updates
+#       system-reboot - target the status of pending system reboots
+#       all (default) - target all supported update status variables
+#
+#   * update_status_check (default: true): check if the status variable is set
+#   * update_status_reset (default: false): reset the status variable
+#   * update_status_set (default: false): set the status variable
+#   * update_status_brief (default: false): use a brief update status output
+#
+---
+- include: _ardana-update-status.yml

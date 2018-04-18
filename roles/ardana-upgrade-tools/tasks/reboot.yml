@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017-2018 SUSE LLC
+# (c) Copyright 2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -16,16 +15,18 @@
 #
 ---
 
-list_pkg_upgrades_base: []
+- name: ardana-upgrade-tools | install | Reboot node
+  become: yes
+  shell: sleep 2 && shutdown -r now
+  async: 1
+  poll: 0
 
-zypper_update_licenses_agree: false
-zypper_update_gpg_checks: true
-zypper_update_include_reboot_patches: false
-zypper_update_method: patch
-
-running_on_deployer: false
-
-skip_single_host_checks: false
-skip_clm_updates_checks: false
-
-ardanauser_home: "{{ ansible_env['HOME'] }}"
+- name: ardana-upgrade-tools | install | Wait for node to come back up
+  delegate_to: localhost
+  wait_for:
+    host: "{{ ansible_ssh_host | default(inventory_hostname) }}"
+    port: 22
+    search_regex: OpenSSH
+    state: started
+    delay: 30
+    timeout: 600
