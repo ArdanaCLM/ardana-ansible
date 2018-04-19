@@ -22,13 +22,13 @@
 
 - name: deployer-setup | install-isos | Get HOS8 ISO path
   find_zypper_iso:
-    name: HPE-HELION-OPENSTACK-CLOUD
+    name: HPE-HELION-OPENSTACK
   become: yes
   register: hos8_iso
 
 - name: deployer-setup | install-isos | Fail if both flavors are present
   fail: >
-    Found both SUSE OpenStack Cloud 8 and HPE Helion OpenStack Cloud 8 present
+    Found both SUSE OpenStack Cloud 8 and HPE Helion OpenStack 8 present
     on the system. Remove one to continue.
   when: soc8_iso.path != '' and hos8_iso.path != ''
 
@@ -45,7 +45,7 @@
 
 - include: "find-iso.yml"
   vars:
-    find_iso_header: "HPE Helion OpenStack Cloud 8"
+    find_iso_header: "HPE Helion OpenStack 8"
     find_iso_file: "{{ hos8_iso.path }}"
     find_iso_mount_dir: ""
     find_iso_marker_file: "media.1/products"
