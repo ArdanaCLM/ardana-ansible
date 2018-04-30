@@ -32,7 +32,7 @@ server_cfg_dir: "{% if deployer_media_legacy_layout|bool -%}
 server_comp_cfg: "{{ server_cfg_dir }}/{{ server_comp }}.conf"
 server_restart_required: false
 
-log_dir: "/var/log/ardana_installer"
+log_dir: "/var/cache/ardana_installer"
 tmp_dir: "/var/cache/ardana_installer"
 
 systemd_config_dir: "/etc/systemd/system/{{ server_comp }}.service.d"
