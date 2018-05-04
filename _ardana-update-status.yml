@@ -1,0 +1,81 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+- hosts: resources
+  vars:
+    update_status_brief: false
+    update_status_var: all
+    update_status_set: false
+    update_status_reset: false
+  tasks:
+    - name: _ardana-update-status | Initialise update status list
+      set_fact:
+        update_status: []
+
+    - name: _ardana-update-status | Set default global update status
+      set_fact:
+        _default_update_status: |
+          No pending update actions on the {{ inventory_hostname }} host
+          were collected or reset during this update run or persisted during
+          previous unsuccessful or incomplete update runs.
+
+    - include: roles/ardana-upgrade-tools/tasks/check-pending-clm-update.yml
+      when: update_status_var in ["clm-update", "all"]
+
+    - name: _ardana-update-status | Add pending CLM update status to status list
+      set_fact:
+        update_status: "{{ update_status +
+          [update_status_brief | bool | ternary('CLM update', update_status_msg)] }}"
+      when: update_status_var in ["clm-update", "all"] and
+            pending_clm_update|bool
+
+    - include: roles/ardana-upgrade-tools/tasks/check-pending-service-update.yml
+      when: update_status_var in ["service-update", "all"]
+
+    - name: _ardana-update-status | Add pending service update status to status list
+      set_fact:
+        update_status: "{{ update_status +
+          [update_status_brief | bool | ternary('service update', update_status_msg)] }}"
+      when: update_status_var in ["service-update", "all"] and
+            pending_service_update|bool
+
+    - include: roles/ardana-upgrade-tools/tasks/check-pending-system-reboot.yml
+      when: update_status_var in ["system-reboot", "all"]
+
+    - name: _ardana-update-status | Add pending system reboot status to status list
+      set_fact:
+        update_status: "{{ update_status +
+          [update_status_brief | bool | ternary('system reboot', update_status_msg)] }}"
+      when: update_status_var in ["system-reboot", "all"] and
+            pending_system_reboot|bool
+
+    - name: _ardana-update-status | Report brief update status
+      debug:
+        msg: "Pending update actions: {{ update_status|join(', ') }}"
+      when: update_status_brief|bool
+
+    - name: _ardana-update-status | Report update status
+      debug:
+        msg: |
+          =====================================================================
+          Update status for node {{ inventory_hostname }}:
+          =====================================================================
+          {% for status in update_status | ternary(update_status, [_default_update_status] ) %}
+          {{ status }}
+
+          {% endfor %}
+          =====================================================================
+      when: not update_status_brief|bool

@@ -1,0 +1,100 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Simple task to handle the special ardana_notify_pending_service_update
+# variable that encodes whether services need to be updated because package
+# updates have been installed during one of the previous update playbook runs.
+#
+#  update_status_reset (default: false): reset the status variable
+#  update_status_set (default: false): set the status variable
+#
+# Return:
+#
+#  The pending_service_update fact is set to reflect the value of the status
+#  variable.
+#  The update_status_msg fact is set to an output message describing the
+#  pending action associated with the status variable.
+
+---
+- name: ardana-upgrade-tools | check-pending-service-update |
+        Initialize pending service update action message
+  set_fact:
+    pending_service_update_msg: |
+      WARNING: packages updates have been installed on the
+      {{ inventory_hostname }} host during this run or there are outstanding
+      update actions persisted from previous unsuccessful or incomplete update
+      runs.
+
+      The update process process must be continued by running the
+      ardana-update.yml playbook to update all services, e.g.:
+
+        cd ~/scratch/ansible/next/ardana/ansible
+        ansible-playbook -i hosts/verb_hosts ardana-update.yml \
+          --limit {{ inventory_hostname }}
+
+      To override this check, set the SKIP_UPDATE_SERVICE_CHECKS environment
+      variable or the skip_update_service_checks ansible variable.
+
+      To recheck the pending service update status at a later time, run:
+
+        cd ~/scratch/ansible/next/ardana/ansible
+        ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
+          --limit {{ inventory_hostname }} \
+          -e update_status_var=service-update
+
+      To reset the pending service update status, run:
+
+        cd ~/scratch/ansible/next/ardana/ansible
+        ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
+          --limit {{ inventory_hostname }} \
+          -e update_status_var=service-update \
+          -e update_status_reset=true
+
+- name: ardana-upgrade-tools | check-pending-service-update |
+        Check pending service update status
+  set_fact:
+    pending_service_update: "{{
+      pending_service_update | default(true) | bool and
+      ardana_notify_pending_service_update is defined and
+      ardana_notify_pending_service_update.changed and
+      (not skip_update_service_checks | default(false) | bool) and
+      (not lookup('env', 'SKIP_UPDATE_SERVICE_CHECKS')|default(false, true))}}"
+
+- name: ardana-upgrade-tools | check-pending-service-update |
+        Reset pending service update persistent fact
+  command: /bin/true
+  changed_when: true
+  register: _pending_service_update_reset
+  when: (update_status_reset | default(false) | bool) and
+        ardana_notify_pending_service_update is defined and
+        ardana_notify_pending_service_update.changed
+
+- name: ardana-upgrade-tools | check-pending-service-update |
+        Reset pending service update cached fact
+  set_fact:
+    pending_service_update: false
+  when: _pending_service_update_reset | changed
+
+- name: ardana-upgrade-tools | check-pending-service-update |
+        Set pending service update cached/persistent fact
+  set_fact:
+    pending_service_update: true
+  changed_when: true
+  register: ardana_notify_pending_service_update
+  when: (update_status_set | default(false) | bool)
+
+- name: ardana-upgrade-tools | check-pending-service-update | Set update action
+  set_fact:
+    update_status_msg: "{{ pending_service_update|bool|ternary(pending_service_update_msg,'') }}"
