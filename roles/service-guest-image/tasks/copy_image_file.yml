@@ -20,10 +20,8 @@
 - name: service-guest-image | copy-image-file | create temporary directory
   command: mktemp -d
   register: guest_image_tempdir
-  when: deployer_media_legacy_layout | bool
   run_once: true
 
 - name: service-guest-image | copy-image-file | copy image to service host
   copy: src="{{ SRC_GUEST_IMAGE_DIR }}/" dest="{{ guest_image_tempdir.stdout }}"
-  when: deployer_media_legacy_layout | bool
   run_once: true

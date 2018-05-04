@@ -60,8 +60,7 @@
 
 # get the md5sum for the new image - non legacy
 - name: service-guest-image | upload-image | get checksum for new image for non legacy
-  become: yes
-  shell: "md5sum {{ SRC_GUEST_IMAGE_DIR }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
+  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
   register: image_checksum
   when: image_id_list.stdout != "" and image_details.results|length > 0 and not (deployer_media_legacy_layout | bool)
   run_once: true
@@ -103,9 +102,8 @@
 
 # upload new image in glance, if current image is not found in glance for non legacy
 - name: service-guest-image | upload-image | Upload new datastore image for non legacy
-  become: yes
   shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}
-  --file {{ SRC_GUEST_IMAGE_DIR }}/{{ IMAGE_NAME }}*.qcow2
+  --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2
   --container-format bare --disk-format qcow2
   --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
   register: image_id_from_glance_upload
