@@ -31,6 +31,9 @@
     vars:
       playbook_name: "ardana-reboot.yml"
 
+# Run this now to synchronize zypper repositories present on the deployer
+- include: _osconfig-setup-repos.yml
+
 - include: osconfig-status.yml
 
 - include: _ardana-update-base.yml
