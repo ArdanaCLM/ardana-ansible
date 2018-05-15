@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -23,11 +23,12 @@
     state: restarted
   when: server_restart_required
 
-- name: installui | start | Ensure that Install UI service is started
+- name: installui | start | Ensure that Install UI service is started and enabled
   become: yes
   service:
     name: "{{ server_comp }}"
     state: started
+    enabled: yes
 
 - name: installui | start | Wait for Install UI service to settle
   command: sleep 5
