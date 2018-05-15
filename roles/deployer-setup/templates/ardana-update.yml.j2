@@ -16,10 +16,13 @@
 {% extends "_ardana-default.yml.j2" %}
 
 {% block header %}
+
+- include: pbstart.yml
+  vars:
+    playbook_name: "ardana-update.yml"
+
 # Pre-Update Phase
 - include: osconfig-status.yml
-- include: ardana-status.yml
-  when: precheck_status | default(false) | bool
 
 #- include: ardana-pre-upgrade-status.yml
 #- include: ardana-upgrade-pkg-query.yml
@@ -40,5 +43,11 @@
 #- include: _ardana-service-post-upgrade.yml
 #- include: _ardana-base-post-upgrade.yml
 #- include: ardana-upgrade-pkg-verify.yml
+
 - include: ardana-status.yml
+
+- include: pbfinish.yml
+  vars:
+    playbook_name: "ardana-update.yml"
+
 {% endblock %}
