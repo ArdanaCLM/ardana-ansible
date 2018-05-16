@@ -22,7 +22,14 @@ default_log_levels = engineio=WARN,socketio=WARN
 port = {{ server_port }}
 db_file = /var/cache/ardana_installer/db.json
 progress_file = /var/cache/ardana_installer/progress.json
+restart_trigger_file = /var/cache/ardana_installer/cloud_install_ui_trigger.txt
 ui_home = {{ ui_comp_dir }}
+ardana_service_url : "{% if ARD_SVC is defined -%}
+                        {{ ARD_SVC.advertises.vips.private[0].url }}
+                      {%- else -%}
+                        http://localhost:9085
+                      {%- endif -%}"
+
 
 [urls]
 {% if HZN_WEB is defined -%}

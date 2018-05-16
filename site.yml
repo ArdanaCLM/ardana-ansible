@@ -41,3 +41,6 @@
 # Asynchronous delayed reset to switch ardana-service to use keystone
 - include: _ardana-service-delayed-reset.yml
 
+# Asynchronous delayed reset to the installer-ui server to pickup the
+# new endpoint of the ardana-service
+- include: _installui-server-delayed-reset.yml
