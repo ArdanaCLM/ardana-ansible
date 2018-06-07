@@ -33,6 +33,7 @@ monasca,\
 mysql,\
 openstack_ceilometer,\
 openstack_cinder,\
+openstack_manila,\
 openstack_glance,\
 openstack_heat,\
 openstack_horizon,\

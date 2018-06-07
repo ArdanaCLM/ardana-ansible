@@ -54,4 +54,5 @@ freezer-upgrade
 tempest-upgrade
 # Update haproxy last as it conflicts with a setting in the beta2 kit
 # where nova-api listens on the vip.
+#manila-upgrade
 FND-CLU-upgrade
