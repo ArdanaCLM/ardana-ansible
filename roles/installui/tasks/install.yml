@@ -91,6 +91,7 @@
     src: "local.conf.j2"
     dest: "{{ systemd_config_file }}"
   notify: installui_change
+  when: deployer_media_legacy_layout|bool
 
 - name: installui | install | Setup Install UI service (venv)
   become: yes
