@@ -14,5 +14,12 @@
 # under the License.
 #
 ---
-supportconfig_options: "-Q"
-timeout: 1200
+
+sosreport_deployer_archives: "/tmp/sosreport-report-archives"
+
+supportutils_local_archive_path_prefix: "/var/log/nts_"
+
+supportconfig_options: "-g -Q"
+
+# timeout in seconds for supportconfig command
+supportutils_timeout: 1800

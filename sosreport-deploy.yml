@@ -23,14 +23,14 @@
     - sosreport
   tasks:
     - include: roles/sosreport/tasks/install.yml
-      when: deployer_media_legacy_layout | bool
+      when: ansible_os_family | lower != 'suse'
 
 - hosts: "all:!localhost:!*-local"
   roles:
     - supportutils
   tasks:
     - include: roles/supportutils/tasks/install.yml
-      when: deployer_media_legacy_layout | bool == False
+      when: (ansible_os_family | lower == 'suse') and not deployer_media_legacy_layout|bool
 
 - hosts: FND-RMQ
   max_fail_percentage: 0

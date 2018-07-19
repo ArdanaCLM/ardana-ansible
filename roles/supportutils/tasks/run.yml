@@ -15,7 +15,44 @@
 #
 # collect supportconfig from all nodes
 ---
+
+- name: supportutils | run | Get timestamp for supportutils execution
+  set_fact:
+    suputils_timestamp: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+
+- name: supportutils | run | Create target output directory name suffix
+  set_fact:
+    suputils_tarbll_suffix: "{{ inventory_hostname }}_{{ suputils_timestamp }}"
+
 - name: supportutils | run | collect supportconfig asynchronously
   become: yes
-  command: supportconfig {{ supportconfig_options }}
-  async: "{{ timeout }}"
+  command: supportconfig {{ supportconfig_options }} -B {{ suputils_tarbll_suffix }}
+  async: "{{ supportutils_timeout }}"
+
+- name: supportutils | run | Create local directory for collecting reports
+  delegate_to: localhost
+  file:
+    path: "{{ sosreport_deployer_archives }}"
+    state: "directory"
+    mode: 0700
+  run_once: yes
+
+- name: supportutils | run | Retrieve supportutils tarball and md5 files
+  become: yes
+  synchronize:
+    mode: pull
+    src: "{{ supportutils_local_archive_path_prefix + suputils_tarbll_suffix + item }}"
+    dest: "{{ sosreport_deployer_archives }}/"
+    compress: no
+  with_items:
+    - '.tgz'
+    - '.tgz.md5'
+
+- name: supportutils | run | Delete per-node tarball and md5 file
+  become: yes
+  file:
+    path: "{{ supportutils_local_archive_path_prefix + suputils_tarbll_suffix + item }}"
+    state: absent
+  with_items:
+    - '.tgz'
+    - '.tgz.md5'

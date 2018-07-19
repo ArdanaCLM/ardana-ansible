@@ -20,5 +20,3 @@
   package:
     state: present
     name: 'supportutils-plugin-suse-openstack-cloud'
-  when:
-    - ansible_os_family | lower == 'suse'
