@@ -16,13 +16,6 @@
 # Playbook for configuring Install UI
 ---
 
-- name: installui | configure | Apply ui config
-  become: yes
-  template:
-    src: "config.json.j2"
-    dest: "{{ ui_comp_cfg }}"
-  notify: installui_change
-
 - name: installui | post-configure | Create server config dir (rpm)
   become: yes
   file:

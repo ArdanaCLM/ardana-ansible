@@ -21,7 +21,6 @@ ui_comp_dir: "{% if deployer_media_legacy_layout|bool -%}
               {%- else -%}
                   /usr/share/ardana/ardana-installer-ui/web
               {%- endif -%}"
-ui_comp_cfg: "{{ ui_comp_dir }}/config.json"
 
 server_comp: installer-server
 server_cfg_dir: "{% if deployer_media_legacy_layout|bool -%}
