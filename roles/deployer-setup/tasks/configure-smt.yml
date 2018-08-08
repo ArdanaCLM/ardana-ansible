@@ -15,11 +15,6 @@
 
 ---
 
-- set_fact:
-    suse_release: suse-{{ansible_distribution_version}}
-
-- include_vars: roles/osconfig/vars/repos-cloud.yml
-
 - name: deployer-setup | configure-smt | Check if SMT paths exist
   stat:
     path: "/srv/www/htdocs/repo/{{ item.value.smt_path }}"
