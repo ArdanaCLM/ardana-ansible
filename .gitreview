@@ -3,4 +3,4 @@ host=gerrit.suse.provo.cloud
 port=29418
 project=ardana/ardana-ansible.git
 defaultremote=ardana
-defaultbranch=master
+defaultbranch=stable/pike
