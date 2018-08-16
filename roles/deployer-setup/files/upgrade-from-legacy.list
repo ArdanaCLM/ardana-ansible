@@ -16,6 +16,7 @@
 #
 #}
 tls-upgrade
+sosreport-upgrade
 supportutils-upgrade
 monasca-agent-upgrade
 # Update Monasca agent for RabbitMQ.
