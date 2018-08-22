@@ -1,0 +1,145 @@
+#
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+suse_release: "suse-{{ansible_distribution_version}}"
+
+http_repo_base_path: "{{ suse_release|replace('.','-')|upper }}"
+http_repo_path: "{{ http_repo_base_path }}/{{ ansible_architecture }}/repos"
+
+cloud_product_iso:
+  soc:
+    suse-12.3:
+      name: SUSE-OPENSTACK-CLOUD-8
+      header: "SUSE OpenStack Cloud 8"
+      marker_file: "media.1/products"
+      marker_file_line: "SOC8 8-0"
+    suse-12.4:
+      name: SUSE-OPENSTACK-CLOUD-9
+      header: "SUSE OpenStack Cloud 9"
+      marker_file: "media.1/products"
+      marker_file_line: "SOC9 9-0"
+  hos:
+    suse-12.3:
+      name: HPE-HELION-OPENSTACK
+      header: "HPE Helion OpenStack 8"
+      marker_file: "media.1/products"
+      marker_file_line: "HOS8 8-0"
+
+expected_repodata:
+  suse-12.3:
+    x86_64:
+      sles12-sp3-pool:
+        name: "SLES12-SP3-Pool"
+        repomd:
+          tags: ["obsproduct://build.suse.de/SUSE:SLE-12-SP3:GA/SLES/12.3/POOL/x86_64"]
+        smt_path: "SUSE/Products/SLE-SERVER/12-SP3/x86_64/product"
+      sles12-sp3-updates:
+        name: "SLES12-SP3-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:SLE-SERVER:12-SP3:x86_64/update"]
+        smt_path: "SUSE/Updates/SLE-SERVER/12-SP3/x86_64/update"
+      suse-openstack-cloud-8-pool:
+        name: "SUSE-OpenStack-Cloud-8-Pool"
+        repomd:
+          tags: ["obsproduct://build.suse.de/SUSE:SLE-12-SP3:Update:Products:Cloud8/suse-openstack-cloud/8/POOL/x86_64"]
+        smt_path: "SUSE/Products/OpenStack-Cloud/8/x86_64/product"
+        brand: "SUSE OpenStack Cloud"
+      hpe-helion-openstack-8-pool:
+        name: "HPE-Helion-OpenStack-8-Pool"
+        repomd:
+          tags: ["obsproduct://build.suse.de/SUSE:SLE-12-SP3:Update:Products:Cloud8/hpe-helion-openstack/8/POOL/x86_64"]
+        smt_path: "SUSE/Products/HPE-Helion-OpenStack/8/x86_64/product"
+        brand: "HPE Helion OpenStack"
+      suse-openstack-cloud-8-updates:
+        name: "SUSE-OpenStack-Cloud-8-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:OpenStack-Cloud:8:x86_64/update"]
+        smt_path: "SUSE/Updates/OpenStack-Cloud/8/x86_64/update"
+        brand: "SUSE OpenStack Cloud"
+      hpe-helion-openstack-8-updates:
+        name: "HPE-Helion-OpenStack-8-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:HPE-Helion-OpenStack:8:x86_64/update"]
+        smt_path: "SUSE/Updates/HPE-Helion-OpenStack/8/x86_64/update"
+        brand: "HPE Helion OpenStack"
+  suse-12.4:
+    x86_64:
+      sles12-sp4-pool:
+        name: "SLES12-SP4-Pool"
+        repomd:
+          tags: ["obsproduct://build.suse.de/SUSE:SLE-12-SP4:GA/SLES/12.4/POOL/x86_64"]
+        smt_path: "SUSE/Products/SLE-SERVER/12-SP4/x86_64/product"
+      sles12-sp4-updates:
+        name: "SLES12-SP4-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:SLE-SERVER:12-SP4:x86_64/update"]
+        smt_path: "SUSE/Updates/SLE-SERVER/12-SP4/x86_64/update"
+      suse-openstack-cloud-9-pool:
+        name: "SUSE-OpenStack-Cloud-9-Pool"
+        repomd:
+          tags: ["obsproduct://build.suse.de/SUSE:SLE-12-SP4:Update:Products:Cloud9/suse-openstack-cloud/9/POOL/x86_64"]
+        smt_path: "SUSE/Products/OpenStack-Cloud/9/x86_64/product"
+        brand: "SUSE OpenStack Cloud"
+      suse-openstack-cloud-9-updates:
+        name: "SUSE-OpenStack-Cloud-9-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:OpenStack-Cloud:9:x86_64/update"]
+        smt_path: "SUSE/Updates/OpenStack-Cloud/9/x86_64/update"
+        brand: "SUSE OpenStack Cloud"
+
+repositories:
+  suse-12.3:
+    x86_64:
+      - alias: Cloud
+        name: Cloud
+      - alias: PTF
+        name: PTF
+      - alias: SLES12-SP3-Pool
+        name: SLES12-SP3-Pool
+      - alias: SLES12-SP3-Updates
+        name:  SLES12-SP3-Updates
+      - alias: SLES12-SP3-Updates-test
+        name:  SLES12-SP3-Updates-test
+      - alias: SUSE-OpenStack-Cloud-8-Pool
+        name: OpenStack-Cloud-8-Pool
+      - alias: SUSE-OpenStack-Cloud-8-Updates
+        name:  OpenStack-Cloud-8-Updates
+      - alias: SUSE-OpenStack-Cloud-8-Updates-test
+        name:  OpenStack-Cloud-8-Updates-test
+      - alias: HPE-Helion-OpenStack-8-Pool
+        name: OpenStack-8-Pool
+      - alias: HPE-Helion-OpenStack-8-Updates
+        name: OpenStack-8-Updates
+      - alias: HPE-Helion-OpenStack-8-Updates-test
+        name: OpenStack-8-Updates-test
+  suse-12.4:
+    x86_64:
+      - alias: Cloud
+        name: Cloud
+      - alias: PTF
+        name: PTF
+      - alias: SLES12-SP4-Pool
+        name: SLES12-SP4-Pool
+      - alias: SLES12-SP4-Updates
+        name:  SLES12-SP4-Updates
+      - alias: SLES12-SP4-Updates-test
+        name:  SLES12-SP4-Updates-test
+      - alias: SUSE-OpenStack-Cloud-9-Pool
+        name: OpenStack-Cloud-9-Pool
+      - alias: SUSE-OpenStack-Cloud-9-Updates
+        name:  OpenStack-Cloud-9-Updates
+      - alias: SUSE-OpenStack-Cloud-9-Updates-test
+        name:  OpenStack-Cloud-9-Updates-test

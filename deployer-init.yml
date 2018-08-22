@@ -19,6 +19,7 @@
 - hosts: localhost
   connection: local
   roles:
+    - product-media
     - cobbler
     - FND-AP2
     - package-consumer # Needed for PACKAGE_CONSTANTS details
@@ -34,8 +35,7 @@
             listen: "*"
             port: "{{ deployer_server_port }}"
             document_root: "{{ PACKAGE_CONSTANTS.REPO_DIR }}"
-            additional_dirs:
-              SUSE-12-3: /srv/www/suse-12.3
+            additional_dirs: "{{ {http_repo_base_path: '/srv/www/'+suse_release} }}"
 
 # Start depends on a notification from above,
 # split it out to make sure the handler fires first
@@ -50,6 +50,7 @@
 - hosts: localhost
   connection: local
   roles:
+    - product-media
     - deployer-setup
     - osconfig
     - thirdparty-repo
