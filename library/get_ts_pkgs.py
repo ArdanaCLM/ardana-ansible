@@ -44,14 +44,21 @@ SRV_DIR = '/opt/stack/service'
 def main():
     ans_module = AnsibleModule(argument_spec=dict())
 
-    # Get all the linked dirs in the service directory
-    service_dirs = [join(SRV_DIR, f) for f in listdir(SRV_DIR)
-                    if islink(join(SRV_DIR, f))]
+    try:
+        # Get all the linked dirs in the service directory
+        service_dirs = [join(SRV_DIR, f) for f in listdir(SRV_DIR)
+                        if islink(join(SRV_DIR, f))]
 
-    # From the linked dirs above, determine the list of timestamped packages
-    ts_pkgs = sorted(set([basename(realpath(join(f, 'venv')))
-                          for f in service_dirs]))
-    result = dict(ts_pkgs=ts_pkgs)
+        # From the linked dirs above, determine the list of timestamped packages
+        ts_pkgs = sorted(set([basename(realpath(join(f, 'venv')))
+                              for f in service_dirs]))
+        result = dict(ts_pkgs=ts_pkgs)
+    except Exception as e:
+        # if SRV_DIR doesn't exist or the linked dirs are messed up
+        # or whatever, something is very wrong, so we'll return an empty
+        # set of packages for this host:
+        result = dict(ts_pkgs={})
+
     ans_module.exit_json(**result)
 
 if __name__ == '__main__':
