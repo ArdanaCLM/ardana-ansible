@@ -21,6 +21,7 @@
   vars:
     playbook_name: "site.yml"
 
+- include: ardana-ssh-keyscan.yml
 - include: ardana-refresh-facts.yml
 
 - include: guard-deployment.yml
