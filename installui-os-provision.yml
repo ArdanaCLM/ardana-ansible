@@ -29,7 +29,7 @@
 ---
 - include: pbstart.yml
   vars:
-    playbook_name: "dayzero-os-provision.yml"
+    playbook_name: "installui-os-provision.yml"
 
 - hosts: localhost
   tasks:
@@ -52,7 +52,7 @@
 - include: cobbler-deploy.yml
 
 # Handle cases where SLES is being provisioned onto boxes with UEFI
-# boot mode enabled.  This adds the necessary grub.cfg files and should 
+# boot mode enabled.  This adds the necessary grub.cfg files and should
 # work with both UEFI and non-UEFI
 - include: prepare-sles-grub2.yml
 
@@ -60,4 +60,4 @@
 
 - include: pbfinish.yml
   vars:
-    playbook_name: "dayzero-os-provision.yml"
+    playbook_name: "installui-os-provision.yml"

@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2015 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,12 +13,21 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+##############################################################################
+#
+# This playbook runs both wipe_disks.yml and site.yml playbook in one operation
+# for the Day0 cloud deployment page.
+#
+##############################################################################
 ---
+- include: pbstart.yml
+  vars:
+    playbook_name: "installui-wipe-and-site.yml"
 
-- name: dayzero_change
-  set_fact:
-    dayzero_restart_required: true
+- include: wipe_disks.yml
+- include: site.yml
 
-- name: dayzero_apache2_change
-  set_fact:
-    dayzero_apache2_restart_required: true
+- include: pbfinish.yml
+  vars:
+    playbook_name: "installui-wipe-and-site.yml"
+
