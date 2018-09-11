@@ -17,20 +17,20 @@
 - hosts: all:!localhost
   max_fail_percentage: 100
   tasks:
-    - name: Gather timestamped packages from all known hosts
-      get_ts_pkgs:
+    - name: Gather package information from all known hosts
+      get_all_pkg_data:
       become: yes
-      register: _get_ts_pkgs
+      register: pkgs
       ignore_errors: yes
 
-    - name: Aggregate timestamped package data to a temporary file
+    - name: Aggregate package data to a temporary file
       copy:
         content: "{
                   {% for host in play_hosts %}
-                      '{{ host }}': {{ hostvars[host]['_get_ts_pkgs']['ts_pkgs'] }}
+                      '{{ host }}': {{ hostvars[host]['pkgs'] }}
                       {% if not loop.last %},{% endif %}
-                  {% endfor %} 
+                  {% endfor %}
                   }"
-        dest: "{{ host_ts_pkgs_file | default('/tmp/host_ts_pkgs_file') }}"
+        dest: "{{ host_pkgs_file | default('/tmp/host_pkgs_file') }}"
       delegate_to: localhost
       when: inventory_hostname == play_hosts[0]
