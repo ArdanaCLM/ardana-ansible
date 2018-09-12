@@ -1,6 +1,6 @@
 #
 # (c) Copyright 2015-2016 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -21,8 +21,16 @@
 # We can limit this to run on one host like following
 #   ansible-playbook -i hosts/verb_hosts ardana-start.yml --limit single-ccp-c1-m1-mgmt
 ---
+- include: pbstart.yml
+  vars:
+    playbook_name: "ardana-start.yml"
+
 # Regather facts on all hosts in case of configuration changes that haven't
 # been reflected in the fact cache
 - include: ardana-refresh-facts.yml
 
 {% include "hooks.yml.j2" %}
+
+- include: pbfinish.yml
+  vars:
+    playbook_name: "ardana-start.yml"
