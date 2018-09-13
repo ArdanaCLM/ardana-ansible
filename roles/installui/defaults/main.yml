@@ -40,4 +40,4 @@ db_file: "{{ tmp_dir }}/db.json"
 progress_file: "{{ tmp_dir }}/progress.json"
 
 # TODO add server_url back when https enabled, requires UI update
-server_port: 3000
+server_port: 2209

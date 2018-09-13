@@ -37,7 +37,7 @@
       uri:
         # ansible v1.9 parameters:
         HEADER_Content-Type: "application/json"
-        url: "http://localhost:3000/api/v1/restart"
+        url: "http://localhost:2209/api/v1/restart"
         method: POST
         body: >
           {"delay": 360}
@@ -49,6 +49,6 @@
     #       We can remove this once we move to ansible 2
     - name: installui | restart | restart retry is failure was detected previously
       command: >
-        curl -X POST -d '{"delay": 360}' -H "Content-Type: application/json" http://localhost:3000/api/v1/restart
+        curl -X POST -d '{"delay": 360}' -H "Content-Type: application/json" http://localhost:2209/api/v1/restart
       ignore_errors: yes
       when: restart_cmd_result|failed and ardana_svc_host_is_deployer

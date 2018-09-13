@@ -1,5 +1,5 @@
 #
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -20,8 +20,3 @@
     - installui
   tasks:
     - include: roles/installui/tasks/stop.yml
-
-# the old dayzero UI was shut off at the end of site.yml
-# TODO - determine whether the new UI should do the same
-# if so, replace dayzero-stop.yml call in site.yml with
-# this play instead
