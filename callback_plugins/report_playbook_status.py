@@ -1,8 +1,15 @@
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2017-2018 SUSE LLC
 
 import os
 import urllib2
 import json
+from contextlib import closing
+import socket
+import sys
+if sys.version_info.major < 3:
+    from urlparse import urlparse
+else:
+    from urllib.parse import urlparse
 
 class CallbackModule(object):
 
@@ -15,6 +22,26 @@ class CallbackModule(object):
         self.srvcurl = 'http://localhost:9085'
         self.timeout = 5  # 5 seconds
         # ardana-service runs on the deployer:9085 by default
+
+    def updateSrvcUrl(self):
+        """ Updates the service url to one advertised by the VIP
+            but only if the corresponding port is connectable
+        """
+        hosts = self.playbook.inventory.get_hosts()
+        if(hosts):
+            try:
+                host_vars = \
+                    self.playbook.inventory.get_variables(hosts[0].name)
+                url = \
+                    host_vars['ARD_SVC']['advertises'][
+                        'vips']['private'][0]['url']
+                purl = urlparse(url)
+                with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+                    s.connect((purl.hostname, purl.port))
+                    self.srvcurl = url
+            except (KeyError, TypeError, socket.error) as error:
+                # leave the existing URL in place if the key isnt found
+                pass
 
     def playbook_on_task_start(self, name, is_conditional):
         """Triggers callbacks other services if a specific play was run
@@ -47,6 +74,7 @@ class CallbackModule(object):
         self.post_to_listener(self.playbook.filename, action)
 
     def post_to_listener(self, playbook, action):
+        self.updateSrvcUrl()
         urlpath = '/api/v2/listener/playbook'
         url = self.srvcurl + urlpath
         try:
