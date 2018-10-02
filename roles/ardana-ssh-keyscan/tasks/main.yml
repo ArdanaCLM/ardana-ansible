@@ -24,4 +24,4 @@
   delegate_to: localhost
   shell: |
     ssh-keygen -R {{ hostvars[inventory_hostname].ansible_ssh_host }}
-    echo "${{ _keyscan_result.stdout }}" >> ${HOME}/.ssh/known_hosts
+    echo "{{ _keyscan_result.stdout }}" >> ${HOME}/.ssh/known_hosts
