@@ -44,5 +44,4 @@
 #- include: horizon-post-upgrade.yml
 #- include: logging-post-upgrade.yml
 #- include: ceilometer-post-upgrade.yml
-#- include: freezer-post-upgrade.yml
 #- include: tempest-post-upgrade.yml

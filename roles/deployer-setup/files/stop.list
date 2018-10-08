@@ -17,7 +17,6 @@
 #
 #}
 # This is reverse order to ardana-deploy.yml and ardana-start.yml
-freezer-stop
 ceilometer-stop
 logging-stop
 # missing horizon-stop

@@ -50,7 +50,6 @@ horizon-reconfigure
 kronos-reconfigure
 ceilometer-reconfigure
 ceilometer-pipeline-reconfigure
-freezer-reconfigure
 #manila-reconfigure
 tempest-reconfigure
 

@@ -44,5 +44,4 @@ heat-restart
 horizon-restart
 logging-restart
 ceilometer-restart
-freezer-restart
 ardana-extra-restart

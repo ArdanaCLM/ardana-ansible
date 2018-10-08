@@ -153,18 +153,6 @@
   vars:
     - service: beaver
 
-- hosts: FRE-API
-  become: yes
-  roles:
-    - freezer-api
-  tasks:
-    - file:
-        path: /etc/apache2/vhosts.d/freezer-modwsgi.conf
-        state: absent
-    - include: roles/FND-AP2/tasks/start_reload.yml
-      vars:
-        apache_restart_requested: yes
-
 - hosts: LOG-SVR
   become: yes
   roles:

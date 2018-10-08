@@ -46,6 +46,5 @@ heat-start
 horizon-start
 logging-start
 ceilometer-start
-freezer-start
 #manila-start
 ardana-extra-start

@@ -48,6 +48,5 @@ heat-status
 horizon-status
 logging-status
 ceilometer-status
-freezer-status
 #manila-status
 ardana-extra-status

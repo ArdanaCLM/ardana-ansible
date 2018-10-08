@@ -44,5 +44,4 @@ _heat-schedule-restart
 _horizon-schedule-restart
 _logging-schedule-restart
 _ceilometer-schedule-restart
-_freezer-schedule-restart
 ardana-extra-schedule-restart

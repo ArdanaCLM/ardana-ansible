@@ -63,10 +63,6 @@ bind-upgrade
 ironic-upgrade
 heat-upgrade
 horizon-upgrade
-#freezer-upgrade
-# Install freezer directly (avoid online status check)
-freezer-deploy
-freezer-status
 
 logging-upgrade
 ceilometer-upgrade

@@ -66,7 +66,6 @@ function quiesce_simul() {
 }
 
 phase_one=(
-    freezer
     ceph
     ceilometer
     heat
