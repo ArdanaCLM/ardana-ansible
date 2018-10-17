@@ -92,7 +92,9 @@ class ServerDetails(object):
         mac_addrs = {}
 
         pattern = re.compile(
-            'link/ether {0} '.format(string.join(6 * ('[a-z0-9][a-z0-9]',), ':'))
+            'link/ether {0} '.format(
+                string.join(6 * ('[a-z0-9][a-z0-9]',), ':')
+            )
         )
         with open(os.path.join(self.src_dir, 'ipa')) as f:
             for line in f.readlines():
@@ -207,14 +209,14 @@ class CinderService(Service):
         try:
             conf['DEFAULT']['volume_driver'] = \
                 cfgparser.get('DEFAULT', 'volume_driver')
-        except:
+        except configparser.NoOptionError:
             pass
 
         # backends
         enabled_backends = None
         try:
             enabled_backends = cfgparser.get('DEFAULT', 'enabled_backends')
-        except:
+        except configparser.NoOptionError:
             pass
         if enabled_backends:
             conf['DEFAULT']['enabled_backends'] = enabled_backends
@@ -230,7 +232,7 @@ class CinderService(Service):
                 try:
                     tmp['volume_driver'] = \
                         cfgparser.get(backend, 'volume_driver')
-                except:
+                except configparser.NoOptionError:
                     pass
 
         return conf
@@ -275,13 +277,13 @@ class GlanceService(Service):
         try:
             conf['glance_store']['stores'] = \
                 cfgparser.get('glance_store', 'stores').split(',')
-        except:
+        except configparser.NoOptionError:
             pass
 
         try:
             conf['glance_store']['default_store'] = \
                 cfgparser.get('glance_store', 'default_store')
-        except:
+        except configparser.NoOptionError:
             pass
 
         return conf
@@ -328,7 +330,8 @@ class BirdsEyeView(object):
         with open(fn, 'r') as f:
             self.definition_cache[path] = yaml.load(f)
 
-    def _product_info(self):
+    @staticmethod
+    def _product_info():
         info = {}
 
         for fn in [
@@ -365,15 +368,16 @@ class BirdsEyeView(object):
         servers = {}
         tmp = self.definition_cache['servers.yml']['servers']
         for server in tmp:
-            servers[server['id']] = {
-                'mac-addr': server['mac-addr'],
-                # 'name': server['name'],
-                # 'control_plane': server['control-plane-name'],
-                # 'failure_zone': server['failure-zone'],
-                'group': server['server-group'],
-                'role': server['role'],
-                # 'state' : server['state'],
-            }
+            if 'id' in server:
+                servers[server['id']] = {
+                    'mac-addr': server.get('mac-addr'),
+                    # 'name': server.get('name'),
+                    # 'control_plane': server.get('control-plane-name'),
+                    # 'failure_zone': server.get('failure-zone'),
+                    'group': server.get('server-group'),
+                    'role': server.get('role'),
+                    # 'state' : server.get('state'),
+                }
         return servers
 
     def _servers(self):
