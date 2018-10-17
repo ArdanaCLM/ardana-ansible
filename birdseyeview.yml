@@ -1,0 +1,174 @@
+# (c) Copyright 2018 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+
+- name: Perform initial, local operations
+  hosts: localhost
+  tasks:
+    - name: Create local temporary directory
+      command: mktemp -d
+      register: _local_tmpdir
+
+
+- name: Collect hardware and software details
+  hosts: all
+  tasks:
+    - name: Create remote temporary directories
+      command: mktemp -d
+      register: _remote_tmpdir
+
+    - name: Collect hostname
+      become: yes
+      shell: 'hostname > {{ _remote_tmpdir.stdout }}/hostname'
+
+    - name: Collect network details
+      become: yes
+      shell: 'ip a > {{ _remote_tmpdir.stdout }}/ipa'
+
+    - name: Collect hardware details
+      become: yes
+      shell: 'dmidecode | sed -n "/^System Information/,/^$/p" > {{ _remote_tmpdir.stdout }}/dmidecode'
+
+    - name: Collect operating system details
+      become: yes
+      command: 'cp /etc/os-release {{ _remote_tmpdir.stdout }}/'
+
+    - name: Gather remote file listings
+      command: 'ls {{ _remote_tmpdir.stdout }}'
+      register: files_to_fetch
+
+    - name: Create local destination directories for nodes' files
+      file:
+        path: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/nodes/{{ inventory_hostname }}/'
+        state: directory
+        mode: 0700
+        recurse: True
+      delegate_to: localhost
+
+    - name: Collect data files from nodes
+      become: yes
+      fetch:
+        src: '{{ _remote_tmpdir.stdout }}/{{ item }}'
+        dest: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/nodes/{{ inventory_hostname }}/'
+        flat: True
+      with_items: '{{ files_to_fetch.stdout_lines }}'
+
+    - name: Remove remote temporary directories
+      file:
+        path: '{{ _remote_tmpdir.stdout }}'
+        state: absent
+
+
+# configuration files are explicitly referenced in services files, not
+# picked up from /etc/cinder
+- name: Collect cinder configuration files
+  hosts: CND-VOL
+  tasks:
+    - name: Fetch service configurations
+      run_once: True
+      become: yes
+      fetch:
+        src: '{{ item[0] | replace("NAME", item[1]) }}'
+        dest: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+        flat: True
+      with_nested:
+        # service directories
+        - [
+            # hLinux
+            '/usr/lib/systemd/system/NAME.service',
+            # SLES
+            '/etc/systemd/system/NAME.service'
+          ]
+        # services
+        - [ 'cinder-api' ]
+      ignore_errors: True
+
+    - name: Get configuration file list
+      run_once: True
+      delegate_to: localhost
+      birdseyeview:
+        action: list_cinder_config_files
+        src: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+      register: config_files
+
+    - name: Fetch configuration files
+      run_once: True
+      become: yes
+      fetch:
+        src: '{{ item }}'
+        dest: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+        flat: True
+      with_items: '{{ config_files.files }}'
+      ignore_errors: True
+
+
+# configuration files are explicitly referenced in services files, not
+# picked up from /etc/glance
+- name: Collect glance configuration files
+  hosts: GLA-API
+  tasks:
+    - name: Fetch service configurations
+      run_once: True
+      become: yes
+      fetch:
+        src: '{{ item[0] | replace("NAME", item[1]) }}'
+        dest: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+        flat: True
+      with_nested:
+        # service directories
+        - [
+            # hLinux
+            '/usr/lib/systemd/system/NAME.service',
+            # SLES
+            '/etc/systemd/system/NAME.service'
+          ]
+        # services
+        - [ 'glance-api' ]
+      ignore_errors: True
+
+    - name: Get configuration file list
+      run_once: True
+      delegate_to: localhost
+      birdseyeview:
+        action: list_glance_config_files
+        src: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+      register: config_files
+
+    - name: Fetch configuration files
+      run_once: True
+      become: yes
+      fetch:
+        src: '{{ item }}'
+        dest: '{{ hostvars["localhost"]._local_tmpdir.stdout }}/'
+        flat: True
+      with_items: '{{ config_files.files }}'
+      ignore_errors: True
+
+
+- name: Perform final, local operations
+  hosts: localhost
+  tasks:
+    - name: Get file listing
+      command: 'ls {{ _local_tmpdir.stdout }}'
+
+    - name: Generate summary
+      birdseyeview:
+        action: generate_summary
+        src: '{{ _local_tmpdir.stdout }}'
+        dest: birdseyeview.yml
+
+    - name: Remove local temporary directory
+      file:
+        path: '{{ _local_tmpdir.stdout }}'
+        state: absent
