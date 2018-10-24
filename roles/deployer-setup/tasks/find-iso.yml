@@ -50,6 +50,7 @@
     check_iso_target_dir: "{{ find_iso_target_dir }}"
     check_iso_marker_file: "{{ find_iso_marker_file }}"
     check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+    check_iso_allow_mismatch: "{{ find_iso_allow_mismatch | default(false) }}"
 
 - name: deployer-setup | find-iso | Try proposed mounted directory
   include: check-iso.yml
@@ -60,6 +61,7 @@
     check_iso_target_dir: "{{ find_iso_target_dir }}"
     check_iso_marker_file: "{{ find_iso_marker_file }}"
     check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+    check_iso_allow_mismatch: "{{ find_iso_allow_mismatch | default(false) }}"
   when: not check_iso_ok|bool
 
 - name: deployer-setup | find-iso | Try proposed ISO file
@@ -71,6 +73,7 @@
     check_iso_target_dir: "{{ find_iso_target_dir }}"
     check_iso_marker_file: "{{ find_iso_marker_file }}"
     check_iso_marker_file_line: "{{ find_iso_marker_file_line }}"
+    check_iso_allow_mismatch: "{{ find_iso_allow_mismatch | default(false) }}"
   when: not check_iso_ok|bool
 
 - name: deployer-setup | find-iso | Warn if no ISO content found anywhere
