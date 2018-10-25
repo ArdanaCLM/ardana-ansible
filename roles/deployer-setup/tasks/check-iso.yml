@@ -88,13 +88,9 @@
 - name: deployer-setup | check-iso | Set internal result flag
   set_fact:
     _check_iso_ok: "{{ check_iso_target_exists_result.stat.exists and
-      check_iso_target_contents_result.stdout
-      |search(check_iso_marker_file_line) }}"
-
-- name: deployer-setup | check-iso | Override result flag if appropriate
-  set_fact:
-    _check_iso_ok: true
-    when: check_iso_allow_mismatch|bool
+      (check_iso_target_contents_result.stdout
+      |search(check_iso_marker_file_line)
+      or check_iso_allow_mismatch|bool) }}"
 
 - name: deployer-setup | check-iso | Print debug info
   debug:
