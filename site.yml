@@ -32,7 +32,6 @@
   tasks:
   - action: setup
 
-- include: installui-reconfigure.yml
 - include: ardana-deploy.yml
 - include: ardana-status.yml
 
@@ -44,4 +43,5 @@
 
 # Asynchronous delayed reset to the installer-ui server to pickup the
 # new endpoint of the ardana-service
+- include: installui-reconfigure.yml
 - include: _installui-server-delayed-reset.yml
