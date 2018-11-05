@@ -16,5 +16,7 @@
 #
 ---
 dependencies:
+  # We include ardana-version for the ardana_version atts
+  - ardana-version
   # We include git-operations for the staging directory
   - git-operations

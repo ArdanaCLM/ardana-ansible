@@ -46,7 +46,7 @@
                   (source is defined or
                   (destination is defined and name is defined)))
   tasks:
-    - include_vars: "{{ playbook_dir }}/ardana_version.yml"
+    - include_vars: "{{ playbook_dir }}/roles/ardana-version/defaults/main.yml"
     - venv_edit:
         name: "{{ name | default(omit) }}"
         src: "{{ source | default(omit) }}"

@@ -15,6 +15,31 @@
 # under the License.
 #
 ---
+# TODO: Remove once venv packages updated to install venvs under ardana-9
+# Start of hack
+- name: deployer-setup | install | Check if ardana_version dir exists
+  stat:
+    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}"
+  register: _stat_repo_dir_ardana_version_result
+
+- name: deployer-setup | install | Check if ardana_old_version exists
+  stat:
+    path: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_old_version }}"
+  register: _stat_repo_dir_ardana_old_result
+
+- name: deployer-setup | install | Create ardana_version link (temp hack)
+  become: yes
+  file:
+    src: "{{ ardana_old_version }}"
+    dest: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}"
+    state: link
+  when:
+    - _stat_repo_dir_ardana_version_result.stat.exists is defined
+    - not _stat_repo_dir_ardana_version_result.stat.exists
+    - _stat_repo_dir_ardana_old_result.stat.exists is defined
+    - _stat_repo_dir_ardana_old_result.stat.exists
+# End of hack
+
 - name: deployer-setup | install | Install prerequisites and packages
   become: yes
   package: name={{ item }} state=present

@@ -17,6 +17,7 @@
 # Playbook for setting up the Configuration Processor on the deployer
 ---
 - include_vars: "{{ playbook_dir }}/ardana_version.yml"
+  when: deployer_media_legacy_layout|bool
 
 - name: config-processor  | install | Update venv cache
   become: yes

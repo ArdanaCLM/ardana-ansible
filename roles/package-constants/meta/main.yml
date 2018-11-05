@@ -1,6 +1,5 @@
 #
-# (c) Copyright 2015 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017 SUSE LLC
+# (c) Copyright 2018 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -14,10 +13,7 @@
 # License for the specific language governing permissions and limitations
 # under the License.
 #
+# Import 'ardana-version' to get access to the ardana_version attrs
 ---
 dependencies:
-  # We import ardana-version for the ardana_version attrs
   - ardana-version
-  - package-constants
-  # We import git-operations in order to get the staging directory
-  - git-operations

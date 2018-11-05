@@ -16,6 +16,7 @@
 #
 ---
 - include_vars: "{{ playbook_dir }}/ardana_version.yml"
+  when: deployer_media_legacy_layout|bool
 # non-SUSE
 - include_vars: "{{ ansible_os_family | lower }}.yml"
   when: not ansible_os_family | lower | search('suse')
