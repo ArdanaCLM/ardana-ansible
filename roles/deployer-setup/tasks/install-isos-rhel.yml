@@ -26,3 +26,4 @@
     find_iso_marker_file_line: "Red Hat Enterprise Linux "
     find_iso_target_dir:
       "{{ PACKAGE_CONSTANTS.REPO_DIR }}/ardana/rhel7/yum/OS"
+    find_iso_allow_mismatch: true
