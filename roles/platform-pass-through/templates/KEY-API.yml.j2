@@ -17,7 +17,6 @@
 #
 #}
 ---
-keystone_admin_token: "{{ KEY_API.vars.keystone_admin_token | openstack_user_password_encrypt(pass_through_key) }}"
 keystone_admin_url: "{{ KEY_API.advertises.vips.admin[0].url }}"
 keystone_private_url: "{{ KEY_API.advertises.vips.private[0].url }}"
 keystone_public_url: "{{ KEY_API.advertises.vips.public[0].url }}"
