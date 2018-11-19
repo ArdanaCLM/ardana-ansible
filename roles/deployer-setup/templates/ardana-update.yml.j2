@@ -44,6 +44,12 @@
 #- include: _ardana-base-post-upgrade.yml
 #- include: ardana-upgrade-pkg-verify.yml
 
+# Node update was completed successfully, reset the update status variable
+- include: _ardana-update-status.yml
+  vars:
+    update_status_var: service-update
+    update_status_reset: true
+
 - include: ardana-status.yml
 
 - include: pbfinish.yml
