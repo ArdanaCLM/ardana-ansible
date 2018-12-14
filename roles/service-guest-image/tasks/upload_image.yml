@@ -17,15 +17,9 @@
 ---
 
 # set the guest image name
-- name: service-guest-image | upload-image | set image name for legacy media layout
-  set_fact:
-      img_name: "{{ IMAGE_NAME }}_{{ PRODUCT }}"
-  when: deployer_media_legacy_layout | bool
-
 - name: service-guest-image | upload-image | set image name for non legacy media layout
   set_fact:
       img_name: "{{ IMAGE_NAME }}"
-  when: not (deployer_media_legacy_layout | bool)
 
 # check for existing images with matching name to the new image
 - name: service-guest-image | upload-image | get list of image ids
@@ -51,18 +45,11 @@
   register: image_details
   run_once: true
 
-# get the md5sum for the new image - legacy
-- name: service-guest-image | upload-image | get checksum for new image for legacy
-  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2 | cut -d ' ' -f 1"
-  register: image_checksum
-  when: image_id_list.stdout != "" and image_details.results|length > 0 and (deployer_media_legacy_layout | bool)
-  run_once: true
-
-# get the md5sum for the new image - non legacy
-- name: service-guest-image | upload-image | get checksum for new image for non legacy
+# get the md5sum for the new image
+- name: service-guest-image | upload-image | get checksum for new image
   shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
   register: image_checksum
-  when: image_id_list.stdout != "" and image_details.results|length > 0 and not (deployer_media_legacy_layout | bool)
+  when: image_id_list.stdout != "" and image_details.results|length > 0
   run_once: true
 
 # verify if the md5sum match and if the image is in ACTIVE status
@@ -89,26 +76,15 @@
   when: image_id_from_glance_lookup is defined and not item|skipped and image_id_from_glance_lookup.changed == true
   run_once: true
 
-# upload new image in glance, if current image is not found in glance for legacy
-- name: service-guest-image | upload-image | Upload new datastore images for legacy
-  shell: "{{ GLANCE_CLIENT }} image-create --name {{ img_name }}
-  --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}.qcow2
-  --container-format bare --disk-format qcow2
-  --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
-  register: image_id_from_glance_upload
-  environment: *OS_ENV
-  when: image_id_from_glance_lookup.changed == false and (deployer_media_legacy_layout | bool)
-  run_once: true
-
-# upload new image in glance, if current image is not found in glance for non legacy
-- name: service-guest-image | upload-image | Upload new datastore image for non legacy
+# upload new image in glance, if current image is not found in glance
+- name: service-guest-image | upload-image | Upload new datastore image
   shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}
   --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2
   --container-format bare --disk-format qcow2
   --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
   register: image_id_from_glance_upload
   environment: *OS_ENV
-  when: image_id_from_glance_lookup.changed == false and not (deployer_media_legacy_layout | bool)
+  when: image_id_from_glance_lookup.changed == false
   run_once: true
 
 # if the image upload was done then export the new image id to be used in service configuration

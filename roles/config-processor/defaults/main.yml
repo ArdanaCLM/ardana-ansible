@@ -16,11 +16,11 @@
 # Defaults for the config-processor
 ---
 
-config_processor_bin_dir: "{{ 'config-processor' | bin_dir if deployer_media_legacy_layout|bool else '/usr/bin/' }}"
+config_processor_bin_dir: "/usr/bin/"
 config_processor_share_dir: "{{ 'config-processor' | share_dir }}/ardana-config-processor"
 
 config_processor_data_dir: "{{ config_processor_share_dir }}/Data"
-config_processor_driver_dir: "{{ config_processor_share_dir + '/Driver' if deployer_media_legacy_layout|bool else '/usr/bin/'}}"
+config_processor_driver_dir: "/usr/bin/"
 
 config_processor_install_dir: "{{ git_operations_staging_directory }}"
 config_processor_runtime_dir: "{{ git_operations.cp_target_dir }}"
@@ -34,7 +34,7 @@ config_processor_runtime_work: "{{ config_processor_runtime_dir }}/my_cloud"
 config_processor_deploy_work: "{{ config_processor_deploy_dir }}/{{ deploy_subdir }}/my_cloud"
 
 # TODO: nearly the same thing is defined in deployer-setup/defaults/main.yml as deployer_input_model_src
-config_processor_input_model_services_src: "{{ ardanauser_home + '/' + ardana_version + '/ardana-input-model/2.0/services' if deployer_media_legacy_layout|bool else '/usr/share/ardana/input-model/2.0/services'}}"
+config_processor_input_model_services_src: "/usr/share/ardana/input-model/2.0/services"
 
 config_processor_install:
   schema:  "{{ config_processor_data_dir }}/Site"
@@ -47,7 +47,7 @@ config_processor_install:
 
 config_processor_runtime:
   schema:  "{{ config_processor_data_dir }}/Site"
-  service: "{{ config_processor_runtime_ardana + '/services' if deployer_media_legacy_layout|bool else '/usr/share/ardana/input-model/2.0/services' }}"
+  service: "{{ config_processor_input_model_services_src }}"
   input: "{{ config_processor_runtime_work }}/definition"
   output: "{{ config_processor_runtime_work }}"
   log: /var/log/configuration_processor

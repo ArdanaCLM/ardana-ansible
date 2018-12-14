@@ -15,34 +15,6 @@
 # under the License.
 #
 ---
-# Disable all localhost client if installed.
-- hosts: localhost
-  connection: local
-  vars:
-    service_client_remove:
-      - openstack
-      - ceilometer
-      - cinder
-      - designate
-      - glance
-      - heat
-      - ironic
-      - keystone
-      - neutron
-      - nova
-      - swift
-      - monasca
-      - barbican
-      - magnum
-      - manila
-  tasks:
-    - name: clients-upgrade | Disable all localhost clients
-      become: yes # noqa
-      file:
-        path: /usr/bin/{{ item }}
-        state: absent
-      with_items: service_client_remove
-      when: deployer_media_legacy_layout|bool
 
 # Upgrade openstack clients that are in model.
 - include: clients-deploy.yml

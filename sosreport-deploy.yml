@@ -30,22 +30,4 @@
     - supportutils
   tasks:
     - include: roles/supportutils/tasks/install.yml
-      when: (ansible_os_family | lower == 'suse') and not deployer_media_legacy_layout|bool
-
-- hosts: FND-RMQ
-  max_fail_percentage: 0
-  roles:
-    - sosreport
-    - rabbitmq # Bring in the RabbitMQ environment
-  tasks:
-    - include: roles/sosreport/tasks/install_rabbitmq.yml
-      when: deployer_media_legacy_layout | bool
-
-- hosts: OPS-LM
-  max_fail_percentage: 0
-  roles:
-    - sosreport
-    - git-operations # Bring in the git variables
-  tasks:
-    - include: roles/sosreport/tasks/install_git_repo.yml
-      when: deployer_media_legacy_layout | bool
+      when: ansible_os_family | lower == 'suse'

@@ -16,23 +16,6 @@
 #
 # Playbook for setting up the Configuration Processor on the deployer
 ---
-- include_vars: "{{ playbook_dir }}/ardana_version.yml"
-  when: deployer_media_legacy_layout|bool
-
-- name: config-processor  | install | Update venv cache
-  become: yes
-  install_package:
-    cache: update
-
-- name: config-processor | install | Install the Configuration Processor
-  become: yes
-  when: deployer_media_legacy_layout|bool
-  install_package:
-    name: config_processor
-    service: config-processor
-    state: present
-    activate: act_on
-
 - name: config-processor | install | Create base log directory
   become: yes
   file:
@@ -53,12 +36,3 @@
   with_items:
     - "{{ config_processor_install.logfile_output }}"
     - "{{ config_processor_install.logfile_errors }}"
-
-- name: config-processor | install | Copy Configuration Processor Services into work dir
-  when: deployer_media_legacy_layout|bool
-  synchronize:
-    src: "{{ config_processor_input_model_services_src }}"
-    dest: "{{ config_processor_install_ardana }}"
-    recursive: yes
-  delegate_to: deployer
-

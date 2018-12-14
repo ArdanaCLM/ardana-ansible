@@ -20,26 +20,11 @@
   command: mktemp -d
   register: src_guest_image_tempdir
 
-- name: service-guest-image | extract_guest-image | extract archive
-  unarchive: src={{ service_package }} dest={{ src_guest_image_tempdir.stdout }}
-  when: deployer_media_legacy_layout | bool
-
-- name: service-guest-image | extract_guest-image | get manifest file name
-  shell: ls {{ src_guest_image_tempdir.stdout }}/*.yml
-  register: manifest_file_name
-  when: deployer_media_legacy_layout | bool
-
-- name: service-guest-image | extract_guest-image | load guest-image metadata
-  include_vars: "{{manifest_file_name.stdout}}"
-  register: guest_image_metadata
-  when: deployer_media_legacy_layout | bool
-
 - name: service-guest-image | extract_guest-image | extract the rpm file
   become: yes
   zypper:
     name: "{{ service_package }}"
     state: present
-  when: not (deployer_media_legacy_layout | bool)
 
 - name: service-guest-image | extract_guest-image | register the qcow2 image file
   become: yes
@@ -47,11 +32,9 @@
   args:
     chdir: "/srv/tftpboot/files/openstack-octavia-amphora-image"
   register: src_octavia_image_file_name
-  when: not (deployer_media_legacy_layout | bool)
 
 - name: service-guest-image | extract_guest-image | copy image to temp_dir
   become: yes
   shell: cp openstack-octavia-amphora-image*.qcow2 {{ src_guest_image_tempdir.stdout }}
   args:
     chdir: "/srv/tftpboot/files/openstack-octavia-amphora-image"
-  when: not (deployer_media_legacy_layout | bool)

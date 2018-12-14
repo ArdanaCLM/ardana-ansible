@@ -31,7 +31,7 @@
   become: yes
   command: ./create_index --dir={{ item.0 | dirname }}
   args:
-    chdir: "{{ 'packager' | bin_dir if deployer_media_legacy_layout|bool else '/usr/bin/' }}"
+    chdir: "/usr/bin/"
   when: item.1.stat.exists
   with_together:
     - "{{ destination }}"

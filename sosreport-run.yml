@@ -23,11 +23,11 @@
     - sosreport
   tasks:
     - include: roles/sosreport/tasks/run.yml
-      when: ( deployer_media_legacy_layout|bool ) or ( ansible_os_family | lower != 'suse' )
+      when: ansible_os_family | lower != 'suse'
 
 - hosts: "all:!localhost:!*-local"
   roles:
     - supportutils
   tasks:
     - include: roles/supportutils/tasks/run.yml
-      when: not deployer_media_legacy_layout|bool and ( ansible_os_family | lower == 'suse' )
+      when: ansible_os_family | lower == 'suse'

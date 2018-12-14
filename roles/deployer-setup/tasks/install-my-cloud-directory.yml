@@ -31,15 +31,7 @@
 
 - include_vars: ../defaults/ardana_tar_locations.yml
 
-- name: deployer-setup | install-my-cloud-directory | Install configuration symlinks
-  unarchive:
-    src: "{{ ardanauser_home }}/{{ deployer_config_tarball }}"
-    dest: "{{ git_operations_staging_directory }}/my_cloud/config"
-    copy: no
-  when: deployer_media_legacy_layout|bool
-
 - name: deployer-setup | install-my-cloud-directory | Create configuration symlinks
   include: _create_symlinks.yml
   vars:
     work_dir: "{{ git_operations_staging_directory }}/my_cloud/config"
-  when: deployer_media_legacy_layout|bool == false

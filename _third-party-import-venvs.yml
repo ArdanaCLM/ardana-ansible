@@ -27,9 +27,6 @@
     - third-party
     - git-operations
   tasks:
-    - name: _third-party-import-venv | Get ardana version
-      include_vars: "{{ playbook_dir }}/ardana_version.yml"
-      when: deployer_media_legacy_layout|bool
     - name: _third-party-import-venv | Get list of third-party venvs
       shell: ls -d1 -- {{ third_party_root_dir }}/{{ third_party_venvs_dir_glob }}
       register: venv_list_result

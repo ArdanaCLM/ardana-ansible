@@ -22,7 +22,4 @@
   vars:
     service_client: "{{ install_package }}"
   tasks:
-    - include: roles/service-client/tasks/install.yml
-      when: deployer_media_legacy_layout|bool
     - include: roles/service-client/tasks/install-rpm.yml
-      when: deployer_media_legacy_layout|bool == false

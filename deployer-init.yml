@@ -57,8 +57,6 @@
   tasks:
     - include_vars: roles/deployer-setup/defaults/ardana_tar_locations.yml
     - include: roles/deployer-setup/tasks/install.yml
-    - include: roles/deployer-setup/tasks/install-isos-legacy.yml
-      when: deployer_media_legacy_layout|bool
     - include: roles/deployer-setup/tasks/install-isos-product.yml
     - include: roles/deployer-setup/tasks/install-isos-rhel.yml
     - include: roles/deployer-setup/tasks/configure-smt.yml
@@ -85,10 +83,7 @@
     - deployer-setup
   tasks:
     - include: roles/deployer-setup/tasks/install-my-cloud-directory.yml
-    - include: roles/deployer-setup/tasks/install-input-model-contents-legacy.yml
-      when: deployer_media_legacy_layout|bool
     - include: roles/deployer-setup/tasks/install-input-model-contents.yml
-      when: deployer_media_legacy_layout|bool == false
     - include: roles/deployer-setup/tasks/install-venv-contents.yml
     - include: roles/deployer-setup/tasks/install-rhel-support.yml
 
@@ -101,8 +96,6 @@
     - package-repo
     - package-consumer
   tasks:
-    - include: roles/package-repo/tasks/install.yml
-      when: deployer_media_legacy_layout|bool
     - include: roles/package-repo/tasks/configure.yml
     - include: roles/package-consumer/tasks/install.yml
     - include: roles/package-consumer/tasks/configure.yml
