@@ -1,1 +1,1 @@
-localhost  ansible_connection=local deployer_media_legacy_layout=False
+localhost  ansible_connection=local
