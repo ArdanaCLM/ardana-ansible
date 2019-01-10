@@ -51,7 +51,7 @@ horizon-reconfigure
 kronos-reconfigure
 ceilometer-reconfigure
 ceilometer-pipeline-reconfigure
-#manila-reconfigure
+manila-reconfigure
 tempest-reconfigure
 
 # Post Reconfiguration tasks
