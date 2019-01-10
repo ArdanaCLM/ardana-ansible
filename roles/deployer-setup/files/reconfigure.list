@@ -52,7 +52,7 @@ kronos-reconfigure
 ceilometer-reconfigure
 ceilometer-pipeline-reconfigure
 freezer-reconfigure
-#manila-reconfigure
+manila-reconfigure
 tempest-reconfigure
 
 # Post Reconfiguration tasks

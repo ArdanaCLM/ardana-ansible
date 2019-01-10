@@ -51,5 +51,5 @@ rabbitmq-stop
 percona-stop
 #tls-stop
 monasca-agent-stop
-#manila-stop
+manila-stop
 ardana-extra-stop

@@ -55,5 +55,5 @@ logging-deploy
 ceilometer-deploy
 freezer-deploy
 tempest-deploy
-#manila-deploy
+manila-deploy
 ardana-extra-deploy
