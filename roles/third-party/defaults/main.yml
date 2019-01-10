@@ -17,7 +17,6 @@
 ---
 
 third_party_pkgs_dir: "pkgs"
-third_party_debian_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/debian/*"
 third_party_rhel_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/rhel/*"
 third_party_sles_pkgs_dir_glob: "{{ third_party_root_dir }}/*/{{ third_party_pkgs_dir }}/suse/*"
 
@@ -43,23 +42,19 @@ main_repo_logging_dir: "{{ ardanauser_home }}/openstack/my_cloud/config/logging/
 third_party_scratch_dir: "{{ ardanauser_home }}/scratch/.third_party"
 
 venv_locs:
-  debian: hlinux_venv
   redhat: rhel_venv
   suse: sles_venv
 
 distro_list: "{{ hostvars['localhost']['distro_list'] }}"
 
 pkg_locs:
-  debian: "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.hlinux[ansible_architecture] }}"
   redhat:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.rhel[ansible_architecture] }}"
   suse:  "{{ PACKAGE_CONSTANTS.REPO_DIR~'/'~ardana_version~'/'~package_venv_locations.sles[ansible_architecture] }}"
 
 pkg_manifests:
-  debian: "{{ (pkg_locs.debian + '/packages') | load_packages() }}"
   redhat: "{{ (pkg_locs.redhat + '/packages') | load_packages() }}"
   suse: "{{ (pkg_locs.suse + '/packages') | load_packages() }}"
 
 base_manifests:
-  debian: "{{ (pkg_locs.debian + '/base_packages') | load_packages() }}"
   redhat: "{{ (pkg_locs.redhat + '/base_packages') | load_packages() }}"
   suse: "{{ (pkg_locs.suse + '/base_packages') | load_packages() }}"

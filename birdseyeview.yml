@@ -85,8 +85,6 @@
       with_nested:
         # service directories
         - [
-            # hLinux
-            '/usr/lib/systemd/system/NAME.service',
             # SLES
             '/etc/systemd/system/NAME.service'
           ]
@@ -128,8 +126,6 @@
       with_nested:
         # service directories
         - [
-            # hLinux
-            '/usr/lib/systemd/system/NAME.service',
             # SLES
             '/etc/systemd/system/NAME.service'
           ]

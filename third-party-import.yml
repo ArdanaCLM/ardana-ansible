@@ -18,9 +18,6 @@
 ---
 
 - include: distro-list.yml
-- include: _third-party-import-debian-pkgs.yml
-  when: ansible_os_family | lower = 'debian' or
-        (third_party_debian_enabled | default(false) | bool)
 - include: _third-party-import-rhel-pkgs.yml
   when: third_party_rhel_enabled | default(false) | bool
 - include: _third-party-import-sles-pkgs.yml
@@ -39,6 +36,5 @@
     - include: roles/venv-editor/tasks/update-index.yml
       vars:
         destination:
-          - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.hlinux[ansible_architecture] }}/"
           - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.rhel[ansible_architecture] }}/"
           - "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/{{ package_venv_locations.sles[ansible_architecture] }}/"

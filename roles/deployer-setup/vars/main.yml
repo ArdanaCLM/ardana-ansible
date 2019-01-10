@@ -17,30 +17,11 @@
 ---
 ardanauser_home: "{{ ansible_env['HOME'] }}"
 
-hlinux_distro: "cattleprod"
-
-hlinux_apt_repo_loc: /media/cdrom
-hlinux_apt_backup_loc: /tmp/backup.tar
-foreign_apt_tarball_loc: "{{ ardanauser_home }}/foreign_apt_repo.tgz"
-# The actual names of these tarballs contain an embedded timestamp so we have to search for them.
-netboot_tarball_glob: "{{ hlinux_apt_repo_loc }}/extras/hLinux-{{ hlinux_distro }}-amd64-netboot-*.tar.gz"
-grub_net_glob: "{{ hlinux_apt_repo_loc }}/extras/grub*efi"
-deployer_setup_hlinux_qcow2: "{{ hlinux_apt_repo_loc }}/hos/hlinux.qcow2"
 deployer_setup_qcow2_path: "{{ ardanauser_home }}/stage/images"
 
-hlinux_ova_name: "hlinux.ova"
-hlinux_ova_path: "{{ hlinux_apt_repo_loc }}/hos/{{ hlinux_ova_name }}"
 target_ova_location: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ ardana_version }}/ova_images"
-ova_repo_path: "{{ ardana_version }}/ova_images/{{ hlinux_ova_name }}"
 
-hlinux_repo_loc: ardana/hlinux
 foreign_repo_loc: ardana/foreign
-
-hlinux_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ hlinux_repo_loc }}"
-foreign_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ foreign_repo_loc }}"
-
-hlinux_repo_url: "http://localhost:{{ deployer_server_port }}/{{ hlinux_repo_loc }}"
-hlinux_repo_source: "'deb [arch=amd64] {{ hlinux_repo_url }} cattleprod main contrib non-free'"
 
 # Optional extra YUM repo variables
 yum_extras_loc: ardana/rhel7/yum/extras

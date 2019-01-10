@@ -23,8 +23,6 @@ PACKAGE_CONSTANTS:
 package_venv_locations:
   rhel:
     x86_64: rhel_venv/x86_64
-  hlinux:
-    x86_64: hlinux_venv
   sles:
     x86_64: sles_venv/x86_64
     aarch64: sles_venv/aarch64

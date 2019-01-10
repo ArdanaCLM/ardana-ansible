@@ -16,5 +16,4 @@
 #
 ---
 thirdparty_repo_required_packages:
-  - aptly
   - createrepo

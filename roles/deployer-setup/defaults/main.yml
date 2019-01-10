@@ -15,10 +15,7 @@
 # under the License.
 #
 ---
-hlinux_repo_dir: hlinux
 foreign_repo_dir: foreign
-hlinux_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ hlinux_repo_dir }}"
-foreign_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ hlinux_repo_dir }}"
 deployer_prerequisites:
     - python-yaml
     - ipmitool

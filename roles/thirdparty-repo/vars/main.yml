@@ -19,10 +19,6 @@
 thirdparty_repo_loc: "ardana/{{ repo_name }}"
 thirdparty_apt_repo_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ thirdparty_repo_loc }}"
 
-# Thirdparty APT repo variables
-apt_thirdparty_loc: "ardana/hlinux/apt/{{ repo_name }}"
-apt_thirdparty_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ apt_thirdparty_loc }}"
-
 # Thirdparty YUM repo variables
 yum_thirdparty_loc: "ardana/rhel7/yum/{{ repo_name }}"
 yum_thirdparty_dir: "{{ PACKAGE_CONSTANTS.REPO_DIR }}/{{ yum_thirdparty_loc }}"

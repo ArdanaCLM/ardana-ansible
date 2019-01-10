@@ -21,7 +21,6 @@ deployer_config_tarball: ardana/config.tgz
 
 # Location of all supported os venv tarballs.
 deployer_venv_tarballs:
-  hlinux: CRASHME
   rhel: CRASHME
   sles: CRASHME
 

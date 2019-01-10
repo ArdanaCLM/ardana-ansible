@@ -16,21 +16,6 @@
 #
 ---
 
-- name: thirdparty-repo | configure | Create aptly configuration
-  become: yes
-  template:
-    src: aptly.conf.j2
-    dest: /etc/aptly.conf
-    mode: "0644"
-  when: ansible_os_family | lower == 'debian'
-
-- name: thirdparty-repo | configure | Make sure thirdparty apt repo root exists
-  become: yes
-  file:
-    name: "{{ apt_thirdparty_dir }}/Packages"
-    state: directory
-  when: ansible_os_family | lower == 'suse'
-
 - name: thirdparty-repo | configure | Make sure thirdparty yum repo root exists
   become: yes
   file:
