@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # (c) Copyright 2015-2017 Hewlett Packard Enterprise Development LP
-# (c) Copyright 2017-2018 SUSE LLC
+# (c) Copyright 2017-2019 SUSE LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License"); you may
 # not use this file except in compliance with the License. You may obtain
@@ -188,7 +188,7 @@ echo
 echo "If you prefer to use the UI to install the product, you can"
 echo "do either of the following:"
 echo "    - If you are running a browser on this machine, you can point"
-echo "      your browser to http://localhost:3000 to start the install"
+echo "      your browser to http://localhost:9085 to start the install"
 echo "      via the UI."
 echo "    - If you are running the browser on a remote machine, you will"
 echo "      need to create an ssh tunnel to access the UI.  Please refer"
