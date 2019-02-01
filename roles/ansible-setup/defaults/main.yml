@@ -17,12 +17,14 @@
 ---
 ardanauser_home: "{{ ansible_env['HOME'] }}"
 
-ansible_setup_ardana_filter_plugins: "{{ ardanauser_home }}/openstack/ardana/ansible/filter_plugins"
-ansible_setup_ardana_connection_plugins: "{{ ardanauser_home }}/openstack/ardana/ansible/connection_plugins"
+ansible_openstack_ardana: "{{ ardanauser_home }}/openstack/ardana/ansible"
+ansible_share_plugins: "/usr/share/ansible_plugins"
+ansible_setup_ardana_filter_plugins: "{{ ansible_openstack_ardana }}/filter_plugins"
+ansible_setup_ardana_connection_plugins: "{{ ansible_openstack_ardana }}/connection_plugins"
 
 ansible_setup_bin_dir: "/usr/bin"
 ansible_setup_site_packages: "{{ lookup( 'pipe', ansible_setup_bin_dir ~ '/python -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\"' ) }}"
-hosts_localhost: "{{ ardanauser_home }}/openstack/ardana/ansible/hosts/localhost"
+hosts_localhost: "{{ ansible_openstack_ardana }}/hosts/localhost"
 hosts_verb_hosts: "{{ ardanauser_home }}/scratch/ansible/next/ardana/ansible/hosts/verb_hosts"
 
 ansible_cfg_loc: "{{ ardanauser_home }}/.ansible.cfg"

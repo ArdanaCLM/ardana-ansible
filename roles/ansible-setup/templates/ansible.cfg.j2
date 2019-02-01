@@ -130,13 +130,13 @@ ansible_managed = Managed by Ardana (via ansible): {file} - a ansible rerun migh
 
 
 # set plugin path directories here, separate with colons
-action_plugins     = {{ ansible_setup_site_packages }}/ansible/runner/action_plugins
-callback_plugins   = {{ ansible_setup_site_packages }}/ansible/callback_plugins
-connection_plugins = {{ ansible_setup_ardana_connection_plugins }}:{{ ansible_setup_site_packages }}/ansible/runner/connection_plugins
-lookup_plugins     = {{ ansible_setup_site_packages }}/ansible/runner/lookup_plugins
-vars_plugins       = {{ ansible_setup_site_packages }}/ansible/inventory/vars_plugins
-filter_plugins     = {{ ansible_setup_site_packages }}/ansible/runner/filter_plugins:{{ ansible_setup_ardana_filter_plugins }}
-shell_plugins      = {{ ansible_setup_site_packages }}/ansible/runner/shell_plugins
+action_plugins     = {{ ansible_share_plugins }}/action_plugins
+callback_plugins   = {{ ansible_share_plugins }}/callback_plugins
+connection_plugins = {{ ansible_setup_ardana_connection_plugins }}:{{ ansible_share_plugins }}/connection_plugins
+lookup_plugins     = {{ ansible_share_plugins }}/lookup_plugins
+vars_plugins       = {{ ansible_share_plugins }}/vars_plugins
+filter_plugins     = {{ ansible_setup_ardana_filter_plugins }}:{{ ansible_share_plugins }}/filter_plugins
+shell_plugins      = {{ ansible_share_plugins }}/shell_plugins
 
 
 # by default callbacks are not loaded for /bin/ansible, enable this if you
