@@ -19,4 +19,6 @@
   gather_facts: False
   max_fail_percentage: 0
   roles:
-    - ardana-ssh-keyscan
+    - role: ardana-ssh-keyscan
+      tags:
+        - always
