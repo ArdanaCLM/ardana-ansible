@@ -19,12 +19,11 @@
 #
 # Parameters:
 #
-#  update_status_reset (default: false): reset the status variable
-#  update_status_set (default: false): set the status variable
+#  pending_system_reboot: true to enable the pending state, false otherwise
 #
 # Return:
 #
-#  The pending_system_reboot fact is set to reflect the value of the status
+#  The has_pending_system_reboot fact is set to reflect the value of the status
 #  variable.
 #  The update_status_msg fact is set to an output message describing the
 #  pending action associated with the status variable.
@@ -53,22 +52,20 @@
 
         cd ~/scratch/ansible/next/ardana/ansible
         ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
-          --limit {{ inventory_hostname }} \
-          -e update_status_var=system-reboot
+          --limit {{ inventory_hostname }}
 
-      To reset the pending system reboot status, run:
+      To turn off the pending system reboot status, run:
 
         cd ~/scratch/ansible/next/ardana/ansible
         ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
           --limit {{ inventory_hostname }} \
-          -e update_status_var=system-reboot \
-          -e update_status_reset=true
+          -e pending_system_reboot=off
 
 - name: ardana-upgrade-tools | check-pending-system-reboot |
         Check pending system reboot status
   set_fact:
-    pending_system_reboot: "{{
-      pending_system_reboot | default(true) | bool and
+    has_pending_system_reboot: "{{
+      has_pending_system_reboot | default(true) | bool and
       ardana_notify_pending_system_reboot is defined and
       ardana_notify_pending_system_reboot.changed and
       (not skip_update_reboot_checks | default(false) | bool) and
@@ -79,24 +76,24 @@
   command: /bin/true
   changed_when: true
   register: _pending_system_reboot_reset
-  when: (update_status_reset | default(false) | bool) and
+  when: not (pending_system_reboot | default(true) | bool) and
         ardana_notify_pending_system_reboot is defined and
         ardana_notify_pending_system_reboot.changed
 
 - name: ardana-upgrade-tools | check-pending-system-reboot |
         Reset pending system reboot cached fact
   set_fact:
-    pending_system_reboot: false
+    has_pending_system_reboot: false
   when: _pending_system_reboot_reset | changed
 
 - name: ardana-upgrade-tools | check-pending-system-reboot |
         Set pending system reboot cached/persistent fact
   set_fact:
-    pending_system_reboot: true
+    has_pending_system_reboot: true
   changed_when: true
   register: ardana_notify_pending_system_reboot
-  when: (update_status_set | default(false) | bool)
+  when: (pending_system_reboot | default(false) | bool)
 
 - name: ardana-upgrade-tools | check-pending-system-reboot | Set update action
   set_fact:
-    update_status_msg: "{{ pending_system_reboot|bool|ternary(pending_system_reboot_msg,'') }}"
+    update_status_msg: "{{ has_pending_system_reboot|bool|ternary(pending_system_reboot_msg,'') }}"

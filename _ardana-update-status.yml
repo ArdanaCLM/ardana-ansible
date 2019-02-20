@@ -17,10 +17,15 @@
 - hosts: resources
   vars:
     update_status_brief: false
+
+    # deprecated parameters
     update_status_var: all
     update_status_set: false
     update_status_reset: false
   tasks:
+    - include:
+        roles/ardana-upgrade-tools/tasks/parameter-backwards-compatibility.yml
+
     - name: _ardana-update-status | Initialise update status list
       set_fact:
         update_status: []
@@ -31,40 +36,41 @@
           No pending update actions on the {{ inventory_hostname }} host
           were collected or reset during this update run or persisted during
           previous unsuccessful or incomplete update runs.
+        _default_update_status_brief: None
 
     - include: roles/ardana-upgrade-tools/tasks/check-pending-clm-update.yml
-      when: update_status_var in ["clm-update", "all"]
 
     - name: _ardana-update-status | Add pending CLM update status to status list
       set_fact:
         update_status: "{{ update_status +
           [update_status_brief | bool | ternary('CLM update', update_status_msg)] }}"
-      when: update_status_var in ["clm-update", "all"] and
-            pending_clm_update|bool
+      when: has_pending_clm_update|bool
 
     - include: roles/ardana-upgrade-tools/tasks/check-pending-service-update.yml
-      when: update_status_var in ["service-update", "all"]
 
     - name: _ardana-update-status | Add pending service update status to status list
       set_fact:
         update_status: "{{ update_status +
           [update_status_brief | bool | ternary('service update', update_status_msg)] }}"
-      when: update_status_var in ["service-update", "all"] and
-            pending_service_update|bool
+      when: has_pending_service_update|bool
 
     - include: roles/ardana-upgrade-tools/tasks/check-pending-system-reboot.yml
-      when: update_status_var in ["system-reboot", "all"]
 
     - name: _ardana-update-status | Add pending system reboot status to status list
       set_fact:
         update_status: "{{ update_status +
           [update_status_brief | bool | ternary('system reboot', update_status_msg)] }}"
-      when: update_status_var in ["system-reboot", "all"] and
-            pending_system_reboot|bool
+      when: has_pending_system_reboot|bool
 
     - name: _ardana-update-status | Report brief update status
       debug:
-        msg: "Pending update actions: {{ update_status|join(', ') }}"
+        msg: "Pending update actions for node {{ inventory_hostname + ': ' }}
+             {%- if update_status -%}
+               {{ update_status|join(', ') }}
+             {%- else -%}
+               {{ _default_update_status_brief }}
+             {%- endif -%}
+             "
       when: update_status_brief|bool
 
     - name: _ardana-update-status | Report update status

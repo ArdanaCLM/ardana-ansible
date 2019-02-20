@@ -46,7 +46,7 @@
     # Node reboot was completed successfully, reset the reboot status variable
     - include: roles/ardana-upgrade-tools/tasks/check-pending-system-reboot.yml
       vars:
-        update_status_reset: true
+        pending_system_reboot: off
       when: not running_on_deployer
 
     # Next, reboot deployer node, if included
