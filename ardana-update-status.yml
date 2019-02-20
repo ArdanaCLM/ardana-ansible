@@ -19,17 +19,10 @@
 #
 # The following parameters are available:
 #
-#   * update_status_var: used to select a particular update status variable.
-#     It can take the following values:
+#   * pending_service_update - set the status of pending service updates
+#   * pending_clm_update - set the status of pending CLM updates
+#   * pending_system_reboot - set the status of pending system reboots
 #
-#       service-update - target the status of pending service updates
-#       clm-update - target the status of pending CLM updates
-#       system-reboot - target the status of pending system reboots
-#       all (default) - target all supported update status variables
-#
-#   * update_status_check (default: true): check if the status variable is set
-#   * update_status_reset (default: false): reset the status variable
-#   * update_status_set (default: false): set the status variable
 #   * update_status_brief (default: false): use a brief update status output
 #
 ---

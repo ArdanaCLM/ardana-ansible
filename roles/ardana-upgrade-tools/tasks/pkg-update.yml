@@ -158,14 +158,14 @@
   # CLM packages were updated
 - include: check-pending-clm-update.yml
   vars:
-    update_status_set: true
+    pending_clm_update: on
   when: _clm_packages_updated | default(false) | bool
 
   # Register a persistent pending service update action for this node if
   # any packages were updated
 - include: check-pending-service-update.yml
   vars:
-    update_status_set: true
+    pending_service_update: on
   when: ardana_upgraded_pkgs
 
   # Register a persistent pending service update action for all nodes if
@@ -192,7 +192,7 @@
   # https://gerrit.suse.provo.cloud/3745/ is merged.
 - include: check-pending-system-reboot.yml
   vars:
-    update_status_set: true
+    pending_system_reboot: on
   when: _system_packages_updated | default(false) | bool or
         zypper_update_result.rc == 102 # ZYPPER_EXIT_INF_REBOOT_NEEDED
 

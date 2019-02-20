@@ -41,7 +41,7 @@
       msg: "{{ pending_clm_update_msg }}"
     run_once: true
     when: running_on_deployer and (play_hosts | length) > 1 and
-          pending_clm_update | bool
+          has_pending_clm_update | bool
 
   # Then install package updates on remaining nodes
   - name: _ardana-update-base | Update packages on non deployer nodes
