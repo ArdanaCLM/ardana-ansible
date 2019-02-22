@@ -42,14 +42,6 @@ import subprocess
 
 SRV_DIR = '/opt/stack/service'
 
-# This regex matches all (i)nstalled packages from repos containing the name
-# 'SUSE-Openstack'
-re_soc_inst =  re.compile(
-    r'^i\+?\s*\| '
-    r'suse-openstack.* \| '
-    r'(?P<pkg>\S+)\s+\| '
-    r'(?P<vers>\d\S*)\s+\|',
-    re.IGNORECASE)
 
 def get_ts_pkgs():
     try:
@@ -57,7 +49,8 @@ def get_ts_pkgs():
         service_dirs = [join(SRV_DIR, f) for f in listdir(SRV_DIR)
                         if islink(join(SRV_DIR, f))]
 
-        # From the linked dirs above, determine the list of timestamped packages
+        # From the linked dirs above,
+        # determine the list of timestamped packages
         ts_pkgs = sorted(set([basename(realpath(join(f, 'venv')))
                               for f in service_dirs]))
         return ts_pkgs
@@ -65,30 +58,49 @@ def get_ts_pkgs():
         # Something went very wrong here, so return empty list
         return []
 
+
 def get_zypper_cloud_pkgs():
     try:
+        # find the repo that the ardana package was installed from
         output = subprocess.check_output(
-            ['/usr/bin/zypper', 'packages', '--installed'])
+            ['/usr/bin/zypper', 'info', '-t', 'package', 'ardana'])
+        lines = output.split('\n')
+        # parse the name out of the zypper output
+        for line in lines:
+            if line.startswith('Repository'):
+                repo = line.split(':')[1].strip()
+                break
+
+        # look for all packages installed from the same repo as ardanaservice
+        output = subprocess.check_output(
+             ['/usr/bin/zypper', 'packages', '--installed', '--repo', repo])
         lines = output.split('\n')
         packages = {}
         # We put it the package information in a dict to ensure uniqueness
         # i.e. multiple repos can show >1 of the same package-version installed
+        # the regex is parsing the output into groups, the match condition is
+        # universal now
         for line in lines:
-            match = re.match(re_soc_inst, line)
-            if match:
-                packages[match.group('pkg')] = match.group('vers')
+            if('|' not in line):
+                continue
+            fields = line.split('|')
+            pkg = fields[2].strip()
+            vers = fields[3].strip()
+            if('Name' != pkg and 'Version' != vers):
+                packages[pkg] = vers
 
         return packages
     except Exception:
         # Something went very wrong here, so return empty list
         return {}
 
+
 def main():
     packages = {}
     packages['ts_os_pkgs'] = get_ts_pkgs()
     packages['zypper_cloud_pkgs'] = get_zypper_cloud_pkgs()
     ans_module = AnsibleModule(argument_spec=dict())
-    result = dict(host_pkgs = packages)
+    result = dict(host_pkgs=packages)
     ans_module.exit_json(**packages)
 
 if __name__ == '__main__':
