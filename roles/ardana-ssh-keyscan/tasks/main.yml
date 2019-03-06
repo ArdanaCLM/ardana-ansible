@@ -20,8 +20,36 @@
     ssh-keyscan {{ hostvars[inventory_hostname].ansible_ssh_host }}
   register: _keyscan_result
 
-- name: ardana-ssh-keyscan | main | Refresh host key for SSH
+- name: ardana-ssh-keyscan | main | Extract ssh-keyscan output
+  set_fact:
+    _keyscan: "{{ _keyscan_result.stdout }}"
+
+- name: ardana-ssh-keyscan | main | Collate ssh-keyscan results
+  set_fact:
+    _keyscan_data: >-
+      {%- set _ks_hosts = [] -%}
+      {%- set _ks_entries = [] -%}
+      {%- for h in play_hosts -%}
+      {%-   set _ = _ks_hosts.append(hostvars[h].ansible_ssh_host) -%}
+      {%-   set _ = _ks_entries.append(hostvars[h]._keyscan) -%}
+      {%- endfor -%}
+      {{- dict(hosts=_ks_hosts, entries=_ks_entries) -}}
+  run_once: True
+
+- name: ardana-ssh-keyscan | main | Refresh host keys for all nodes in play
   delegate_to: localhost
   shell: |
-    ssh-keygen -R {{ hostvars[inventory_hostname].ansible_ssh_host }}
-    echo "{{ _keyscan_result.stdout }}" >> ${HOME}/.ssh/known_hosts
+    set -eu
+
+    ks_hosts="{{ _keyscan_data.hosts | join(' ') }}"
+    [[ -z "${ks_hosts}" ]] && exit 0
+
+    for h in ${ks_hosts}
+    do
+        ssh-keygen -R ${h} || true
+    done
+
+    echo "{{ _keyscan_data.entries | join('\n') }}" >> ${HOME}/.ssh/known_hosts
+  args:
+    executable: /bin/bash
+  run_once: True
