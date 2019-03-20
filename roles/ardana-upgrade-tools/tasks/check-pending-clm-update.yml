@@ -19,12 +19,11 @@
 #
 # Parameters:
 #
-#  update_status_reset (default: false): reset the status variable
-#  update_status_set (default: false): set the status variable
+#  pending_clm_update: true to enable the pending state, false otherwise
 #
 # Return:
 #
-#  The pending_clm_update fact is set to reflect the value of the status
+#  The has_pending_clm_update fact is set to reflect the value of the status
 #  variable.
 #  The update_status_msg fact is set to an output message describing the
 #  pending action associated with the status variable.
@@ -46,6 +45,13 @@
         ansible-playbook -i hosts/localhost config-processor-run.yml
         ansible-playbook -i hosts/localhost ready-deployment.yml
 
+      To turn off the pending CLM update status, run:
+
+        cd ~/scratch/ansible/next/ardana/ansible
+        ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
+          --limit {{ inventory_hostname }} \
+          -e pending_clm_update=off
+
       Then the update can be resumed by running the same playbook again,
       with the same parameters.
 
@@ -56,22 +62,13 @@
 
         cd ~/scratch/ansible/next/ardana/ansible
         ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
-          --limit {{ inventory_hostname }} \
-          -e update_status_var=clm-update
-
-      To reset the pending CLM update status, run:
-
-        cd ~/scratch/ansible/next/ardana/ansible
-        ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
-          --limit {{ inventory_hostname }} \
-          -e update_status_var=clm-update \
-          -e update_status_reset=true
+          --limit {{ inventory_hostname }}
 
 - name: ardana-upgrade-tools | check-pending-clm-update |
         Check pending CLM update status
   set_fact:
-    pending_clm_update: "{{
-      pending_clm_update | default(true) | bool and
+    has_pending_clm_update: "{{
+      has_pending_clm_update | default(true) | bool and
       ardana_notify_pending_clm_update is defined and
       ardana_notify_pending_clm_update.changed and
       (not skip_update_clm_checks | default(false) | bool) and
@@ -82,24 +79,24 @@
   command: /bin/true
   changed_when: true
   register: _pending_clm_update_reset
-  when: (update_status_reset | default(false) | bool) and
+  when: not (pending_clm_update | default(true) | bool) and
         ardana_notify_pending_clm_update is defined and
         ardana_notify_pending_clm_update.changed
 
 - name: ardana-upgrade-tools | check-pending-clm-update |
         Reset pending CLM update cached fact
   set_fact:
-    pending_clm_update: false
+    has_pending_clm_update: false
   when: _pending_clm_update_reset | changed
 
 - name: ardana-upgrade-tools | check-pending-clm-update |
         Set pending CLM update cached/persistent fact
   set_fact:
-    pending_clm_update: true
+    has_pending_clm_update: true
   changed_when: true
   register: ardana_notify_pending_clm_update
-  when: (update_status_set | default(false) | bool)
+  when: (pending_clm_update | default(false) | bool)
 
 - name: ardana-upgrade-tools | check-pending-clm-update | Set update action
   set_fact:
-    update_status_msg: "{{ pending_clm_update|bool|ternary(pending_clm_update_msg,'') }}"
+    update_status_msg: "{{ has_pending_clm_update|bool|ternary(pending_clm_update_msg,'') }}"

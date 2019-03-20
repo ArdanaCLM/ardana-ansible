@@ -18,8 +18,7 @@
 # variable (useful on the deployer, which is rebooted manually)
 - include: _ardana-update-status.yml
   vars:
-    update_status_var: system-reboot
-    update_status_reset: true
+    pending_system_reboot: off
 
 - include: ardana-start.yml
 - include: ardana-status.yml

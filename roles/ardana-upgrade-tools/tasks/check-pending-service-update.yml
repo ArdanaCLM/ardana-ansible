@@ -17,13 +17,14 @@
 # variable that encodes whether services need to be updated because package
 # updates have been installed during one of the previous update playbook runs.
 #
-#  update_status_reset (default: false): reset the status variable
-#  update_status_set (default: false): set the status variable
+# Parameters:
+#
+#  pending_service_update: true to enable the pending state, false otherwise
 #
 # Return:
 #
-#  The pending_service_update fact is set to reflect the value of the status
-#  variable.
+#  The has_pending_service_update fact is set to reflect the value of the
+#  status variable.
 #  The update_status_msg fact is set to an output message describing the
 #  pending action associated with the status variable.
 
@@ -51,22 +52,20 @@
 
         cd ~/scratch/ansible/next/ardana/ansible
         ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
-          --limit {{ inventory_hostname }} \
-          -e update_status_var=service-update
+          --limit {{ inventory_hostname }}
 
-      To reset the pending service update status, run:
+      To turn off the pending service update status, run:
 
         cd ~/scratch/ansible/next/ardana/ansible
         ansible-playbook -i hosts/verb_hosts ardana-update-status.yml \
           --limit {{ inventory_hostname }} \
-          -e update_status_var=service-update \
-          -e update_status_reset=true
+          -e pending_service_update=off
 
 - name: ardana-upgrade-tools | check-pending-service-update |
         Check pending service update status
   set_fact:
-    pending_service_update: "{{
-      pending_service_update | default(true) | bool and
+    has_pending_service_update: "{{
+      has_pending_service_update | default(true) | bool and
       ardana_notify_pending_service_update is defined and
       ardana_notify_pending_service_update.changed and
       (not skip_update_service_checks | default(false) | bool) and
@@ -77,24 +76,24 @@
   command: /bin/true
   changed_when: true
   register: _pending_service_update_reset
-  when: (update_status_reset | default(false) | bool) and
+  when: not (pending_service_update | default(true) | bool) and
         ardana_notify_pending_service_update is defined and
         ardana_notify_pending_service_update.changed
 
 - name: ardana-upgrade-tools | check-pending-service-update |
         Reset pending service update cached fact
   set_fact:
-    pending_service_update: false
+    has_pending_service_update: false
   when: _pending_service_update_reset | changed
 
 - name: ardana-upgrade-tools | check-pending-service-update |
         Set pending service update cached/persistent fact
   set_fact:
-    pending_service_update: true
+    has_pending_service_update: true
   changed_when: true
   register: ardana_notify_pending_service_update
-  when: (update_status_set | default(false) | bool)
+  when: (pending_service_update | default(false) | bool)
 
 - name: ardana-upgrade-tools | check-pending-service-update | Set update action
   set_fact:
-    update_status_msg: "{{ pending_service_update|bool|ternary(pending_service_update_msg,'') }}"
+    update_status_msg: "{{ has_pending_service_update|bool|ternary(pending_service_update_msg,'') }}"

@@ -47,8 +47,7 @@
 # Node update was completed successfully, reset the update status variable
 - include: _ardana-update-status.yml
   vars:
-    update_status_var: service-update
-    update_status_reset: true
+    pending_service_update: off
 
 - include: ardana-status.yml
 
