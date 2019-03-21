@@ -107,3 +107,9 @@
   vars:
     install_hosts: MNL-CLI
     install_package: "{{ MNL_CLI.vars.manila_client }}"
+
+# octavia-client
+- include: client-deploy.yml
+  vars:
+    install_hosts: OCT-CLI
+    install_package: "{{ OCT_CLI.vars.octavia_client }}"
