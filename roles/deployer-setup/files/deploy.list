@@ -54,6 +54,6 @@ horizon-deploy
 logging-deploy
 ceilometer-deploy
 freezer-deploy
-tempest-deploy
 manila-deploy
+tempest-deploy
 ardana-extra-deploy
