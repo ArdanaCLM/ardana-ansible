@@ -53,6 +53,6 @@ heat-deploy
 horizon-deploy
 logging-deploy
 ceilometer-deploy
-tempest-deploy
 manila-deploy
+tempest-deploy
 ardana-extra-deploy

@@ -17,6 +17,7 @@
 #
 #}
 # This is reverse order to ardana-deploy.yml and ardana-start.yml
+manila-stop
 ceilometer-stop
 logging-stop
 # missing horizon-stop
@@ -50,5 +51,4 @@ rabbitmq-stop
 percona-stop
 #tls-stop
 monasca-agent-stop
-manila-stop
 ardana-extra-stop
