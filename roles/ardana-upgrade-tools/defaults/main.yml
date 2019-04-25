@@ -22,6 +22,7 @@ zypper_update_licenses_agree: false
 zypper_update_gpg_checks: true
 zypper_update_include_reboot_patches: false
 zypper_update_method: patch
+zypper_update_repositories: []
 
 running_on_deployer: false
 
