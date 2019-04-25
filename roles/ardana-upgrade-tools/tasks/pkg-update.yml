@@ -31,6 +31,9 @@
 #     from the repository and deletes packages not available in the
 #     repositories.
 #
+#   * zypper_update_repositories: specify the list of repositories from which
+#     packages are pulled.
+#
 #   * zypper_update_gpg_checks (default: true): enable GPG checks.
 #     If set to true, checks if packages are correctly signed.
 #
@@ -62,6 +65,13 @@
       "{{ zypper_update_method }} is not a valid zypper update method."
   when: zypper_update_method not in ["patch", "update", "dist-upgrade"]
 
+- name: ardana-upgrade-tools | pkg-update | Validate (and refresh) repositories
+  become: yes
+  shell: "zypper --non-interactive --gpg-auto-import-keys refresh --force --repo {{ item }}"
+  register: zypper_result
+  failed_when: zypper_result.stderr != ""
+  with_items: "{{ zypper_update_repositories }}"
+
 - name: ardana-upgrade-tools | pkg-update | Generate zypper update command args
   set_fact:
     _zypper_args: >
@@ -76,6 +86,9 @@
       {%- if zypper_update_licenses_agree | bool -%}
       {%-   set _ = _args.append("--auto-agree-with-licenses") -%}
       {%- endif -%}
+      {%- for repo in zypper_update_repositories -%}
+      {%-   set _ = _args.append("--repo " + repo) -%}
+      {%- endfor -%}
       {{ _args }}
 
 - name: ardana-upgrade-tools | pkg-update | Check if the PTF repository is configured
