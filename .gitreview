@@ -1,5 +1,5 @@
 [gerrit]
-host=gerrit.suse.provo.cloud
+host=gerrit.prv.suse.net
 port=29418
 project=ardana/ardana-ansible.git
 defaultremote=ardana
