@@ -15,37 +15,9 @@
 # under the License.
 #
 ---
-# Install and configure apache2 for venv and install ardana-input-model
-- hosts: localhost
-  connection: local
-  roles:
-    - product-media
-    - cobbler
-    - FND-AP2
-    - package-consumer # Needed for PACKAGE_CONSTANTS details
-  tasks:
-    # Deploy Apache
-    - include: roles/FND-AP2/tasks/install.yml
-    - include: roles/FND-AP2/tasks/configure.yml
-      vars:
-        host:
-          vars:
-        FND_AP2_sites_enabled:
-          deployer_venv_server.conf:
-            listen: "*"
-            port: "{{ deployer_server_port }}"
-            document_root: "{{ PACKAGE_CONSTANTS.REPO_DIR }}"
-            additional_dirs: "{{ {http_repo_base_path: '/srv/www/'+suse_release} }}"
-
-# Start depends on a notification from above,
-# split it out to make sure the handler fires first
-- hosts: localhost
-  connection: local
-  gather_facts: no
-  roles:
-    - FND-AP2
-  tasks:
-    - include: roles/FND-AP2/tasks/start.yml
+# Install and configure apache2 to serve venvs and locally available
+# distro trees
+- include: deployer-init-apache.yml
 
 - hosts: localhost
   connection: local
