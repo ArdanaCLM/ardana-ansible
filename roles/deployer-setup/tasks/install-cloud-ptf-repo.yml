@@ -25,7 +25,7 @@
 - name: deployer-setup | install-cloud-ptf-repo | Create PTF repository directory
   become: yes
   file:
-    name: "/srv/www/suse-{{ansible_distribution_version}}/{{ ansible_architecture }}/repos/PTF"
+    name: "/srv/www/{{ suse_release }}/{{ ansible_architecture }}/repos/PTF"
     state: directory
 
 - name: deployer-setup | install-cloud-ptf-repo | Create PTF repodata

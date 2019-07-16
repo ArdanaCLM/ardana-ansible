@@ -29,10 +29,14 @@
   tasks:
   - include: roles/ardana-upgrade-tools/tasks/check-single-host.yml
     vars:
-      playbook_name: "ardana-reboot.yml"
+      playbook_name: "ardana-update-pkgs.yml"
 
 # Run this now to synchronize zypper repositories present on the deployer
 - include: _osconfig-setup-repos.yml
+
+# During upgrade the system repos may have been updated so we need to
+# refresh gathered facts to ensure appropriate actions are taken.
+- include: ardana-refresh-facts.yml
 
 - include: osconfig-status.yml
 

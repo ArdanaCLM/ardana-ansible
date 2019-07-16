@@ -14,7 +14,9 @@
 # under the License.
 #
 ---
-suse_release: "suse-{{ansible_distribution_version}}"
+suse_current_release: "suse-{{ansible_distribution_version}}"
+suse_prev_release: "suse-12.3"
+suse_release: "suse-12.4"
 
 suse_release_aliases: >-
   {%- set _rels = [] -%}
