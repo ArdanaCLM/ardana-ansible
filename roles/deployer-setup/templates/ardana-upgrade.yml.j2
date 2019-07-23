@@ -17,25 +17,50 @@
 {% extends "_ardana-default.yml.j2" %}
 
 {% block header %}
+
+- include: pbstart.yml
+  vars:
+    playbook_name: "ardana-upgrade.yml"
+
 # Pre-Upgrade Phase
-- include: ardana-pre-upgrade-status.yml
-- include: ardana-upgrade-pkg-query.yml
-- include: upgrade-bootstrap.yml
-- include: _osconfig-pre-upgrade.yml
-- include: _ardana-service-pre-upgrade.yml
-- include: _ardana-base-pre-upgrade.yml
+#- include: ardana-pre-upgrade-status.yml
+#- include: ardana-upgrade-pkg-query.yml
+#- include: upgrade-bootstrap.yml
+#- include: _osconfig-pre-upgrade.yml
+#- include: osconfig-status.yml
+#- include: _ardana-service-pre-upgrade.yml
+#- include: _ardana-base-pre-upgrade.yml
 # Upgrade phase
-- include: _ardana-upgrade-base.yml
+#- include: _ardana-upgrade-base.yml
 - include: _osconfig-upgrade.yml
+
+- include: ardana-update-pkgs.yml
+  vars:
+    skip_single_host_checks: true
+    zypper_update_method: dist-upgrade
+    zypper_update_gpg_checks: true
+    zypper_update_licenses_agree: true
+    zypper_update_include_reboot_patches: true
 
 {% endblock %}
 
 {% block footer %}
 
 # Post-Upgrade phase
-- include: _osconfig-post-upgrade.yml
-- include: _ardana-service-post-upgrade.yml
-- include: _ardana-base-post-upgrade.yml
-- include: ardana-upgrade-pkg-verify.yml
+#- include: _osconfig-post-upgrade.yml
+#- include: _ardana-service-post-upgrade.yml
+#- include: _ardana-base-post-upgrade.yml
+#- include: ardana-upgrade-pkg-verify.yml
+
+# Cloud upgrade was completed successfully, reset the update status variable
+- include: _ardana-update-status.yml
+  vars:
+    pending_service_update: off
+
 - include: ardana-status.yml
+
+- include: pbfinish.yml
+  vars:
+    playbook_name: "ardana-upgrade.yml"
+
 {% endblock %}

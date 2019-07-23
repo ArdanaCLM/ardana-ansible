@@ -16,6 +16,7 @@
 # under the License.
 #
 #}
+ardana-upgrade-deprecations
 tls-upgrade
 sosreport-upgrade
 supportutils-upgrade
@@ -23,8 +24,9 @@ monasca-agent-upgrade
 # Update Monasca agent for RabbitMQ.
 rabbitmq-monasca-configure
 clients-upgrade
-percona-upgrade
+galera-upgrade
 FND-AP2-upgrade
+FND-CLU-upgrade
 memcached-upgrade
 keystone-upgrade
 barbican-upgrade
@@ -52,6 +54,3 @@ logging-upgrade
 ceilometer-upgrade
 manila-upgrade
 tempest-upgrade
-# Update haproxy last as it conflicts with a setting in the beta2 kit
-# where nova-api listens on the vip.
-FND-CLU-upgrade
