@@ -15,6 +15,7 @@
 # under the License.
 #
 #}
+ardana-upgrade-deprecations
 sosreport-upgrade
 supportutils-upgrade
 monasca-agent-upgrade
