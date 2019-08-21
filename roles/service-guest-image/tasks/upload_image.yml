@@ -16,6 +16,12 @@
 #
 ---
 
+# convert image to raw format when using SES backend for nova
+- include: convert_to_raw.yml
+  when:
+    - ses_config_path is defined
+    - ses_nova_set_images_type | default(False)
+
 # set the guest image name
 - name: service-guest-image | upload-image | set image name for non legacy media layout
   set_fact:
