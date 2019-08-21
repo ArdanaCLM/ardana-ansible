@@ -1,0 +1,37 @@
+#
+# (c) Copyright 2017-2019 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+- name: service-guest-image | convert-to-raw | Register the qcow2 image file name
+  become: yes
+  shell: ls {{ IMAGE_NAME }}*.qcow2
+  args:
+    chdir: "{{ guest_image_tempdir.stdout }}"
+  register: qcow_image_file_name
+  run_once: true
+
+- name: service-guest-image | convert-to-raw | Convert image to raw format
+  shell: |
+    qemu-img convert {{ qcow_image_file_name.stdout }} \
+      {{ qcow_image_file_name.stdout | replace('qcow2', 'raw') }}
+  args:
+    chdir: "{{ guest_image_tempdir.stdout }}"
+  run_once: true
+
+- name: service-guest-image | convert-to-raw | Register image format
+  set_fact:
+    guest_image_format: "raw"
+  run_once: true
