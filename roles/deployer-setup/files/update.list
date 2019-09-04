@@ -16,6 +16,7 @@
 #
 #}
 ardana-upgrade-deprecations
+tls-upgrade
 sosreport-upgrade
 supportutils-upgrade
 monasca-agent-upgrade
