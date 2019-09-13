@@ -23,7 +23,7 @@ monasca-agent-upgrade
 # Update Monasca agent for RabbitMQ.
 rabbitmq-monasca-configure
 clients-upgrade
-#percona-upgrade
+galera-upgrade
 FND-AP2-upgrade
 memcached-upgrade
 keystone-upgrade
