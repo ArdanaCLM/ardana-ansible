@@ -30,7 +30,15 @@
 #- include: osconfig-status.yml
 #- include: _ardana-service-pre-upgrade.yml
 #- include: _ardana-base-pre-upgrade.yml
+- include: manila-pre-upgrade.yml
+
 # Upgrade phase
+- hosts: all
+  tasks:
+    - name: ardana | ardana-upgrade | Set ardana_upgrade_mode to "upgrade"
+      set_fact:
+        ardana_upgrade_mode: "upgrade"
+
 #- include: _ardana-upgrade-base.yml
 - include: _osconfig-upgrade.yml
 
