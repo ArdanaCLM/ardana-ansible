@@ -44,7 +44,7 @@
 
 # if there is a match get the checksum, id and status for the image
 - name: service-guest-image | upload-image | get image details for matched ids
-  shell: "{{ GLANCE_CLIENT }} image-show {{ item}} | tr -d ' ' | egrep '(checksum|id|status)'"
+  shell: "{{ GLANCE_CLIENT }} image-show {{ item}} | tr -d ' ' | egrep '(checksum|id\\||status)'"
   environment: *OS_ENV
   with_items: "{{image_id_list.stdout_lines}}"
   when: item != ""
