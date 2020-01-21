@@ -30,7 +30,6 @@
 #- include: osconfig-status.yml
 #- include: _ardana-service-pre-upgrade.yml
 #- include: _ardana-base-pre-upgrade.yml
-- include: manila-pre-upgrade.yml
 
 # Upgrade phase
 - hosts: all
@@ -42,6 +41,8 @@
 #- include: _ardana-upgrade-base.yml
 - include: _osconfig-upgrade.yml
 
+- include: ardana-pre-update-pkgs.yml
+
 - include: ardana-update-pkgs.yml
   vars:
     skip_single_host_checks: true
@@ -49,6 +50,8 @@
     zypper_update_gpg_checks: true
     zypper_update_licenses_agree: true
     zypper_update_include_reboot_patches: true
+
+- include: ardana-post-update-pkgs.yml
 
 {% endblock %}
 
