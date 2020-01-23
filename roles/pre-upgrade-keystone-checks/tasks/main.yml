@@ -1,0 +1,31 @@
+#
+# (c) Copyright 2020 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+---
+
+- name: pre-upgrade-keystone-checks | main | Check for keystoneV3 config
+  command: "grep {{ keystone_auth_type }} /etc/monasca/log-api.conf"
+  ignore_errors: True
+  register: keystoneV3_config_chk_result
+
+- set_fact:
+    fail_msg: >-
+     "{{ fail_label }} Keystone V2 ==> V3 API config change backports not detected;
+      need to install latest Maintenance Updates before attempting upgrade."
+  when: keystoneV3_config_chk_result|failed
+
+- set_fact:
+    fail_msgs: >-
+       {{ fail_msgs|default([]) +  [ fail_msg|default('SUCCESS: Keystone V2 ==> V3 API config changes detected.') ] }}

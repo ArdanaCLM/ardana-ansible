@@ -1,0 +1,42 @@
+#
+# (c) Copyright 2020 SUSE LLC
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may
+# not use this file except in compliance with the License. You may obtain
+# a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations
+# under the License.
+#
+# Validation checks which needs to be performed on existing cloud prior to
+# starting the cloud 8 to cloud 9 upgrade.
+---
+
+- name: Initialize an empty list of msgs
+  hosts: localhost:KEY-API:SWF-CMN
+  tasks:
+  - set_fact:
+       fail_msgs: []
+
+- name: Verify Keystone V2 to V3 config changes
+  hosts: KEY-API
+  become: yes
+  roles:
+   - pre-upgrade-keystone-checks
+
+- name: Verify Swift XFS inode size
+  hosts: SWF-CMN
+  become: yes
+  roles:
+   - pre-upgrade-swift-checks
+
+- name: Summary
+  hosts: localhost:KEY-API:SWF-CMN
+  become: yes
+  roles:
+   - pre-upgrade-checks-summary
