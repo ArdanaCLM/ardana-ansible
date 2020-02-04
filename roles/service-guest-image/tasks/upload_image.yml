@@ -22,16 +22,20 @@
     - ses_config_path is defined
     - ses_nova_set_images_type | default(False)
 
-# set the guest image name
-- name: service-guest-image | upload-image | set image name for non legacy media layout
-  set_fact:
-      img_name: "{{ IMAGE_NAME }}"
+# get the md5sum for the new image
+- name: service-guest-image | upload-image | get checksum for new image
+  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
+  register: image_checksum
+  run_once: true
 
-# check for existing images with matching name to the new image
-- name: service-guest-image | upload-image | get list of image ids
-  shell: "{{ GLANCE_CLIENT }} image-list | grep {{ img_name }}| tr -d ' ' | cut -f 2 -d '|'"
+# verify if the md5sum match and if the image is in ACTIVE status
+- name: service-guest-image | upload-image | find image that matches the checksum and name
+  shell: >
+    openstack image list --property checksum={{ image_checksum.stdout }}
+    --status active --name {{ IMAGE_NAME }} -f value -c ID
   environment: &OS_ENV
     OS_AUTH_URL: "{{ openstack_auth_url }}"
+    OS_IDENTITY_API_VERSION: 3
     OS_ENDPOINT_TYPE: "{{ openstack_endpoint_type }}"
     OS_USER_DOMAIN_NAME: "{{ openstack_user_domain_name }}"
     OS_USERNAME: "{{ openstack_username }}"
@@ -39,63 +43,24 @@
     OS_PROJECT_DOMAIN_NAME: "{{ openstack_project_domain_name }}"
     OS_PROJECT_NAME: "{{ openstack_project_name }}"
     OS_CACERT: "{{ openstack_ca_file }}"
-  register: image_id_list
-  run_once: true
-
-# if there is a match get the checksum, id and status for the image
-- name: service-guest-image | upload-image | get image details for matched ids
-  shell: "{{ GLANCE_CLIENT }} image-show {{ item}} | tr -d ' ' | egrep '(checksum|id\\||status)'"
-  environment: *OS_ENV
-  with_items: "{{image_id_list.stdout_lines}}"
-  when: item != ""
-  register: image_details
-  run_once: true
-
-# get the md5sum for the new image
-- name: service-guest-image | upload-image | get checksum for new image
-  shell: "md5sum {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2 | cut -d ' ' -f 1"
-  register: image_checksum
-  when: image_id_list.stdout != "" and image_details.results|length > 0
-  run_once: true
-
-# verify if the md5sum match and if the image is in ACTIVE status
-- name: service-guest-image | upload-image | verify image checksum and status
-  shell: "echo '{{ item.stdout }}' | grep id | cut -d '|' -f 3"
-  with_items: "{{ image_details.results if image_id_list.stdout != '' and image_details.results|length > 0 else []}}"
-  when: item.stdout != "" and image_checksum.stdout != "" and "|checksum|{{image_checksum.stdout}}" in "{{item.stdout}}" and "|status|active|" in "{{item.stdout}}"
   register: matched_image_ids
-  run_once: true
-
-# Use the id of the first image which matches the checksum
-- name: service-guest-image | upload-image | get the image id
-  shell: "echo {{ item.stdout }}"
-  with_items: "{{ matched_image_ids.results | default([])}}"
-  when: matched_image_ids is defined and not item|skipped and matched_image_ids.changed ==true and matched_image_ids.results|length > 0
-  register: image_id_from_glance_lookup
-  run_once: true
-
-# export the matched image id from glance lookup to be used in service configuration
-- name: service-guest-image | upload-image | use image id from glance lookup
-  set_fact:
-    service_guest_image_id: "{{ item }}"
-  with_items: "{{image_id_from_glance_lookup.results | default([])}}"
-  when: image_id_from_glance_lookup is defined and not item|skipped and image_id_from_glance_lookup.changed == true
   run_once: true
 
 # upload new image in glance, if current image is not found in glance
 - name: service-guest-image | upload-image | Upload new datastore image
-  shell: "{{ GLANCE_CLIENT }} image-create --name {{ IMAGE_NAME }}
-  --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2
-  --container-format bare --disk-format qcow2
-  --visibility private | tr -d ' ' | grep id | cut -f 3 -d '|'"
+  shell: >
+    openstack image create
+    --file {{ guest_image_tempdir.stdout }}/{{ IMAGE_NAME }}*.qcow2
+    --container-format bare --disk-format qcow2
+    --private {{ IMAGE_NAME }} -f value -c id
   register: image_id_from_glance_upload
   environment: *OS_ENV
-  when: image_id_from_glance_lookup.changed == false
+  when: matched_image_ids.stdout == ""
   run_once: true
 
-# if the image upload was done then export the new image id to be used in service configuration
+# if the image upload was done then export the new image id to be used in service configuration,
+# otherwise use the existing image id
 - name: service-guest-image | upload-image | use image id from glance upload
   set_fact:
-    service_guest_image_id: "{{image_id_from_glance_upload}}"
-  when: image_id_from_glance_lookup.changed == false and image_id_from_glance_upload.stdout != ""
+    service_guest_image_id: "{% if not (image_id_from_glance_upload | skipped) %}{{ image_id_from_glance_upload.stdout }}{% else %}{{ matched_image_ids.stdout_lines[0] }}{% endif %}"
   run_once: true
