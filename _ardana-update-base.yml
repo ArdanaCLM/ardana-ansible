@@ -43,9 +43,33 @@
     when: running_on_deployer and (play_hosts | length) > 1 and
           has_pending_clm_update | bool
 
+  # Release cache pages after upgrade of system packages
+  - name: _ardana-update-base | Release cached pages after upgrade
+    become: yes
+    shell: >-
+      sync; sysctl -w vm.drop_caches=1
+    when:
+      - ardana_upgrade_mode is defined
+      - ardana_upgrade_mode == "upgrade"
+
+- hosts: resources
+  serial: 1  # Serialised
+  roles:
+    - ardana-upgrade-tools
+  tasks:
+
   # Then install package updates on remaining nodes
   - name: _ardana-update-base | Update packages on non deployer nodes
     include: roles/ardana-upgrade-tools/tasks/pkg-update.yml
     when: ansible_os_family | lower == 'suse' and
           install_package_updates | default(false) | bool and
           not running_on_deployer
+
+  # Release cache pages after upgrade of system packages
+  - name: _ardana-update-base | Release cached pages after upgrade
+    become: yes
+    shell: >-
+      sync; sysctl -w vm.drop_caches=1
+    when:
+      - ardana_upgrade_mode is defined
+      - ardana_upgrade_mode == "upgrade"
