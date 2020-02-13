@@ -17,7 +17,7 @@
 # playbooks, e.g. freezer has been deprecated and no longer has any
 # top-level playbooks.
 ---
-- hosts: all
+- hosts: resources
   roles:
     - role: deprecated-vhost-removal
       remove_vhosts_list:
