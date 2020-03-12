@@ -39,7 +39,6 @@
         ardana_upgrade_mode: "upgrade"
 
 #- include: _ardana-upgrade-base.yml
-- include: _osconfig-upgrade.yml
 
 - include: ardana-pre-update-pkgs.yml
 
@@ -53,6 +52,7 @@
 
 - include: ardana-post-update-pkgs.yml
 
+- include: _osconfig-upgrade.yml
 {% endblock %}
 
 {% block footer %}
