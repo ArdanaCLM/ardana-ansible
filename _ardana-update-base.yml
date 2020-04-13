@@ -18,6 +18,9 @@
 
 - hosts: resources
   roles:
+    - iptables
+    # including rabbitmq here ensures the relevant facts are loaded here
+    - rabbitmq
     - ardana-upgrade-tools
   tasks:
 
@@ -43,18 +46,18 @@
     when: running_on_deployer and (play_hosts | length) > 1 and
           has_pending_clm_update | bool
 
-  # Release cache pages after upgrade of system packages
-  - name: _ardana-update-base | Release cached pages after upgrade
-    become: yes
-    shell: >-
-      sync; sysctl -w vm.drop_caches=1
-    when:
-      - ardana_upgrade_mode is defined
-      - ardana_upgrade_mode == "upgrade"
-
 - hosts: resources
   serial: 1  # Serialised
   roles:
+    - iptables
+    # NOTE: Technically including rabbitmq here could fail, as the
+    # sanity checking of the play_host setting (which should be 1
+    # due to serialisation) vs group membership of the associated
+    # FND-RMQ control plane loop, in the rabbitmq role's main.yml
+    # task list should fail, but since rabbitmq has already been
+    # pulled in above in a non-serialised top-level play, it should
+    # be safe to include it again here.
+    - rabbitmq
     - ardana-upgrade-tools
   tasks:
 
@@ -64,12 +67,3 @@
     when: ansible_os_family | lower == 'suse' and
           install_package_updates | default(false) | bool and
           not running_on_deployer
-
-  # Release cache pages after upgrade of system packages
-  - name: _ardana-update-base | Release cached pages after upgrade
-    become: yes
-    shell: >-
-      sync; sysctl -w vm.drop_caches=1
-    when:
-      - ardana_upgrade_mode is defined
-      - ardana_upgrade_mode == "upgrade"

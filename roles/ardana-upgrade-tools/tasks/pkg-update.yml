@@ -105,9 +105,18 @@
 - name: ardana-upgrade-tools | pkg-update | Get set of installed pkgs before update
   rpm_list:
 
-- name: ardana-upgrade-tools | pkg-update  | Set _pre_update_pkgs fact
+- name: ardana-upgrade-tools | pkg-update | Set _pre_update_pkgs fact
   set_fact:
     _pre_update_pkgs: "{{ installed_pkgs | default([]) }}"
+
+- name: ardana-upgrade-tools | pkg-update | Stop rabbitmq-server before upgrade of system packages
+  include: rmq-upgrade-action.yml
+  vars:
+    rmq_upgrade_action: stop
+  when:
+    - inventory_hostname in groups[verb_hosts.FND_RMQ]
+    - ardana_upgrade_mode is defined
+    - ardana_upgrade_mode == "upgrade"
 
 # Sometimes zypper needs to go through several iterations when installing
 # patches, e.g. when those patches include updates to the zypper packages
@@ -119,6 +128,21 @@
   until: zypper_update_result.rc != 103 # ZYPPER_EXIT_INF_RESTART_NEEDED
   retries: 5
   ignore_errors: yes
+
+- name: ardana-upgrade-tools | pkg-update | Release cached pages after upgrade of system packages
+  include: drop-caches.yml
+  when:
+    - ardana_upgrade_mode is defined
+    - ardana_upgrade_mode == "upgrade"
+
+- name: ardana-upgrade-tools | pkg-update | Start rabbitmq-server after upgrade of system packages
+  include: rmq-upgrade-action.yml
+  vars:
+    rmq_upgrade_action: start
+  when:
+    - inventory_hostname in groups[verb_hosts.FND_RMQ]
+    - ardana_upgrade_mode is defined
+    - ardana_upgrade_mode == "upgrade"
 
 - name: ardana-upgrade-tools | pkg-update | Get set of installed pkgs after update
   rpm_list:
