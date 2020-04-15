@@ -122,6 +122,10 @@ repositories:
         name:  SLES12-SP3-Updates
       - alias: SLES12-SP3-Updates-test
         name:  SLES12-SP3-Updates-test
+      - alias: SLES12-SP3-LTSS-Updates
+        name:  SLES12-SP3-LTSS-Updates
+      - alias: SLES12-SP3-LTSS-Updates-test
+        name:  SLES12-SP3-LTSS-Updates-test
       - alias: SUSE-OpenStack-Cloud-8-Pool
         name: OpenStack-Cloud-8-Pool
       - alias: SUSE-OpenStack-Cloud-8-Updates
