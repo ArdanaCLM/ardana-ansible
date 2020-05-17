@@ -18,6 +18,8 @@
 sosreport-upgrade
 supportutils-upgrade
 monasca-agent-upgrade
+# Update users access for RabbitMQ.
+rabbitmq-configure-users
 # Update Monasca agent for RabbitMQ.
 rabbitmq-monasca-configure
 clients-upgrade
