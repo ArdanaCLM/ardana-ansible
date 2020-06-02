@@ -37,6 +37,7 @@
     OS_AUTH_URL: "{{ openstack_auth_url }}"
     OS_IDENTITY_API_VERSION: 3
     OS_ENDPOINT_TYPE: "{{ openstack_endpoint_type }}"
+    OS_INTERFACE: "{{ openstack_endpoint_type }}"
     OS_USER_DOMAIN_NAME: "{{ openstack_user_domain_name }}"
     OS_USERNAME: "{{ openstack_username }}"
     OS_PASSWORD: "{{ openstack_password }}"
