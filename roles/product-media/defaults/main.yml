@@ -60,6 +60,11 @@ expected_repodata:
         repomd:
           tags: ["obsrepository://build.suse.de/SUSE:Updates:SLE-SERVER:12-SP3:x86_64/update"]
         smt_path: "SUSE/Updates/SLE-SERVER/12-SP3/x86_64/update"
+      sles12-sp3-ltss-updates:
+        name: "SLES12-SP3-LTSS-Updates"
+        repomd:
+          tags: ["obsrepository://build.suse.de/SUSE:Updates:SLE-SERVER:12-SP3-LTSS:x86_64/update"]
+        smt_path: "SUSE/Updates/SLE-SERVER/12-SP3-LTSS/x86_64/update"
       suse-openstack-cloud-8-pool:
         name: "SUSE-OpenStack-Cloud-8-Pool"
         repomd:
