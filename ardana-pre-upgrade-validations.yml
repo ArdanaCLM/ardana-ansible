@@ -23,8 +23,12 @@
   - set_fact:
        fail_msgs: []
 
-- name: Verify Keystone V2 to V3 config changes
-  hosts: KEY-API
+# NOTE: Monasca API was the last service for which Keystone V2 to V3
+# changeover backports were completed so by checking for the relevant
+# config change in the monasca/log-api.conf file on the MON-API nodes
+# we can confirm that the cloud is ready for upgrade.
+- name: Verify Keystone V2 to V3 config changes on MML nodes
+  hosts: MON-API
   become: yes
   roles:
    - pre-upgrade-keystone-checks
