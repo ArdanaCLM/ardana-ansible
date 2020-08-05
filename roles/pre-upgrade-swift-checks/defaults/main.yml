@@ -15,5 +15,5 @@
 #
 ---
 
-swift_xfs_inode_min_size : "{{ lookup('env', 'UPGRADE_SWIFT_XFS_INODE_MIN_SIZE') | default('257', true) }}"
+swift_xfs_inode_rec_size : "{{ lookup('env', 'UPGRADE_SWIFT_XFS_INODE_REC_SIZE') | default('512', true) }}"
 

@@ -14,14 +14,23 @@
 # under the License.
 #
 ---
-- name: pre-upgrade-swift-checks | main | Get swiftXFS inode size
-  shell: xfs_info /srv/node/disk0 | grep isize| cut -d ',' -f 1 | awk '{ print $2 }' | cut -d '=' -f 2
+- name: pre-upgrade-swift-checks | main | Find Swift XFS mounts
+  shell: mount -t xfs | awk '$5 == "xfs" && $3 ~ /^[/]srv[/]node[/]disk[0-9][0-9]*/ {print $3}' | sort
+  register: _swift_xfs_mounts
+
+- name: pre-upgrade-swift-checks | main | Get Swift XFS inode size
+  shell: xfs_info "{{ item }}" | grep isize | cut -d ',' -f 1 | awk '{ print $2 }' | cut -d '=' -f 2
   register: _swift_inode_size
+  with_items: "{{ _swift_xfs_mounts.stdout.splitlines() }}"
 
 - set_fact:
-    fail_swift_msg: "{{ fail_label }} pre-upgrade-swift-checks: Swift XFS inode size needs to be at least {{ swift_xfs_inode_min_size }}. It is currently at {{ _swift_inode_size.stdout }}. "
-  when: ( _swift_inode_size.stdout|int < {{ swift_xfs_inode_min_size|int }} )
+    fail_swift_msg: |-
+      {%- for _isize in _swift_inode_size.results -%}
+      {%   if (_isize.stdout|int) < (swift_xfs_inode_rec_size|int) %}
+      {{ note_label }} pre-upgrade-swift-checks: Swift XFS inode size of {{ _isize.stdout }} for {{ _isize.item }} is smaller than SLE 12 SP4 recommended {{ swift_xfs_inode_rec_size }}. Some recommended XFS data integrity features may not be available after upgrade.
+      {%   endif %}
+      {%- endfor -%}
 
 - set_fact:
     fail_msgs: >-
-       {{ fail_msgs|default([]) +  [ fail_swift_msg|default('SUCCESS: pre-upgrade-swift-checks: Swift XFS inode size is at least ' ~ swift_xfs_inode_min_size ) ] }}
+      {{ fail_msgs|default([]) +  [ fail_swift_msg|default('SUCCESS: pre-upgrade-swift-checks: Swift XFS inode size is at least ' ~ swift_xfs_inode_rec_size ) ] }}

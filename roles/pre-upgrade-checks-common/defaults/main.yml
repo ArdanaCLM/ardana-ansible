@@ -17,3 +17,5 @@
 
 fail_msgs: []
 fail_label: "FAIL:"
+warn_label: "WARN:"
+note_label: "NOTE:"
