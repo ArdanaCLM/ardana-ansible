@@ -18,7 +18,7 @@
 ---
 
 - name: Initialize an empty list of msgs
-  hosts: localhost:KEY-API:SWF-CMN
+  hosts: localhost:MON-API:SWF-CMN
   tasks:
   - set_fact:
        fail_msgs: []
@@ -40,7 +40,7 @@
    - pre-upgrade-swift-checks
 
 - name: Summary
-  hosts: localhost:KEY-API:SWF-CMN
+  hosts: localhost:MON-API:SWF-CMN
   become: yes
   roles:
    - pre-upgrade-checks-summary
