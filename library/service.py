@@ -547,6 +547,8 @@ class LinuxService(Service):
         status_dict = {}
         for line in out.splitlines():
             if not key:
+                if not line:
+                    continue
                 key, value = line.split('=', 1)
                 # systemd fields that are shell commands can be multi-line
                 # We take a value that begins with a "{" as the start of
