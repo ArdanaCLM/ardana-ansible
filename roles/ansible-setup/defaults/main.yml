@@ -23,7 +23,7 @@ ansible_setup_ardana_filter_plugins: "{{ ansible_openstack_ardana }}/filter_plug
 ansible_setup_ardana_connection_plugins: "{{ ansible_openstack_ardana }}/connection_plugins"
 
 ansible_setup_bin_dir: "/usr/bin"
-ansible_setup_site_packages: "{{ lookup( 'pipe', ansible_setup_bin_dir ~ '/python -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\"' ) }}"
+ansible_setup_site_packages: "{{ lookup( 'pipe', '/usr/bin/python -c \"from distutils.sysconfig import get_python_lib; print(get_python_lib())\"' | quote) | quote}}"
 hosts_localhost: "{{ ansible_openstack_ardana }}/hosts/localhost"
 hosts_verb_hosts: "{{ ardanauser_home }}/scratch/ansible/next/ardana/ansible/hosts/verb_hosts"
 
