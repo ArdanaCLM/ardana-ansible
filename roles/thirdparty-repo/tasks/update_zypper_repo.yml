@@ -26,7 +26,7 @@
 
 - name: thirdparty-repo | update_zypper_repo | Generate snapshot name
   set_fact:
-    ss_dir: "{{ lookup('pipe', 'date +%s') }}"
+    ss_dir: "{{ lookup('pipe', '/usr/bin/date +%s' | quote) | quote }}"
 
 - name: thirdparty-repo | update_zypper_repo | Make directory for new snapshot
   become: yes

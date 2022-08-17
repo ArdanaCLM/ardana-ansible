@@ -18,7 +18,7 @@
 
 - name: supportutils | run | Get timestamp for supportutils execution
   set_fact:
-    suputils_timestamp: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+    suputils_timestamp: "{{ lookup('pipe','/usr/bin/date +%Y%m%d%H%M%S' | quote) | quote }}"
 
 - name: supportutils | run | Create target output directory name suffix
   set_fact:

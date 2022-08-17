@@ -19,7 +19,7 @@
 
 - name: sosreport | run | Create sosreport timestamp
   set_fact:
-    sos_timestamp: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+    sos_timestamp: "{{ lookup('pipe','/usr/bin/date +%Y%m%d%H%M%S' | quote) | quote }}"
 
 - name: sosreport | run | Create sosreport output directory name
   set_fact:

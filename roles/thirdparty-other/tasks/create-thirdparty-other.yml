@@ -34,7 +34,7 @@
 
 - name: thirdparty-other | create-thirdparty-other | Create scratch directory
   set_fact:
-    scratch_loc: "{{ lookup('pipe', 'mktemp -d') }}"
+    scratch_loc: "{{ lookup('pipe', '/usr/bin/mktemp -d' | quote) |quote }}"
 
 - name: thirdparty-other | create-thirdparty-other |
         Copy files to scratch zone
@@ -65,7 +65,7 @@
 - name: thirdparty-other | create-thirdparty-other | Create directory for tarball
   set_fact:
     output_tar: >
-      {{ lookup('pipe', 'mktemp -d') }}/{{ content_name }}-{{ version }}.tgz
+      {{ lookup('pipe', '/usr/bin/mktemp -d' | quote) | quote }}/{{ content_name }}-{{ version }}.tgz
 
 - name: thirdparty-other | create-thirdparty-other | Package up content
   become: yes

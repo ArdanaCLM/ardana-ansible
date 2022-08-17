@@ -32,7 +32,7 @@
 - name: thirdparty-venv | create-thirdparty-venvs |
         Make temp wheelhouse for content to install
   set_fact:
-    wheelhouse: "{{ lookup('pipe', 'mktemp -d') }}"
+    wheelhouse: "{{ lookup('pipe', '/usr/bin/mktemp -d' | quote) | quote }}"
 
 - name: thirdparty-venv | create-thirdparty-venvs |
         Convert debs to wheels and add to wheelhouse
